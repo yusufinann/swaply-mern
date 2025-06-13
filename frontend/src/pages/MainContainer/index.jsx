@@ -1,4 +1,4 @@
-import {Box, Container } from "@mui/material"; // Container ekleyebilirsiniz isteğe bağlı
+import {Box} from "@mui/material"; 
 import { Outlet } from "react-router-dom";
 
 function MainContainer() {

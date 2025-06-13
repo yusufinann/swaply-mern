@@ -4,9 +4,22 @@ import bcrypt from 'bcryptjs';
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
-  name: { type: String, required: true, trim: true },
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true, match: /.+@.+\..+/ },
-  password: { type: String, required: true, minlength: 6 },
+  firstName: { type: String, required: [true, "Ad alanı zorunludur."], trim: true },
+  lastName: { type: String, required: [true, "Soyad alanı zorunludur."], trim: true },
+  email: {
+    type: String,
+    required: [true, "E-posta alanı zorunludur."],
+    unique: true,
+    lowercase: true,
+    trim: true,
+    match: [/.+@.+\..+/, "Lütfen geçerli bir e-posta adresi girin."],
+  },
+  password: {
+    type: String,
+    required: [true, "Şifre alanı zorunludur."],
+    minlength: [6, "Şifre en az 6 karakter olmalıdır."],
+    select: false, // Sorgularda varsayılan olarak şifreyi getirme
+  },
   avatarUrl: { type: String, default: '' },
   rating: { type: Number, default: 0, min: 0, max: 5 },
   swapCount: { type: Number, default: 0 },
@@ -21,8 +34,8 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-userSchema.methods.comparePassword = function(candidatePwd) {
-  return bcrypt.compare(candidatePwd, this.password);
+userSchema.methods.comparePassword = async function(candidatePwd) {
+  return await bcrypt.compare(candidatePwd, this.password);
 };
 
 export const User = model('User', userSchema);

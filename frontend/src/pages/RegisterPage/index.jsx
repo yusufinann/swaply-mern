@@ -1,5 +1,4 @@
-// RegisterPage.js
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Container,
   Paper,
@@ -7,70 +6,50 @@ import {
   Typography,
   TextField,
   Button,
-  Link,
+  Link as MuiLink,
   Grid,
   IconButton,
   InputAdornment,
   Avatar,
   Divider,
-  Stack, // Stack'i aktif olarak kullanacağız
+  Stack,
   Alert,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  CircularProgress
 } from '@mui/material';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import GoogleIcon from '@mui/icons-material/Google';
-
-// Sitenizin logosunu buraya import edin veya direkt URL kullanın
-// import TakastaLogo from './path/to/your/takasta-logo.png';
+import { useRegisterPage } from './useRegisterPage';
 
 const RegisterPage = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError('');
-
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError('Tüm zorunlu alanlar doldurulmalıdır.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Şifreler eşleşmiyor.');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Şifre en az 6 karakter olmalıdır.');
-      return;
-    }
-    if (!agreeToTerms) {
-      setError('Kullanım koşullarını ve gizlilik politikasını kabul etmelisiniz.');
-      return;
-    }
-
-    console.log('Kayıt denemesi:', { firstName, lastName, email, password, agreeToTerms });
-    // TODO: Gerçek API çağrısı
-  };
-
-  const handleClickShowPassword = () => setShowPassword(!showPassword);
-  const handleMouseDownPassword = (event) => event.preventDefault();
-  const handleClickShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
-  const handleMouseDownConfirmPassword = (event) => event.preventDefault();
-  const handleGoogleLogin = () => {
-    console.log('Google ile kayıt/giriş yapılıyor...');
-    setError('');
-  };
+  const {
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    agreeToTerms,
+    setAgreeToTerms,
+    showPassword,
+    showConfirmPassword,
+    error,
+    loading,
+    handleSubmit,
+    handleClickShowPassword,
+    handleMouseDownPassword,
+    handleClickShowConfirmPassword,
+    handleMouseDownConfirmPassword,
+    handleGoogleLogin,
+    navigate,
+  } = useRegisterPage();
 
   return (
     <Box
@@ -106,15 +85,14 @@ const RegisterPage = () => {
           </Typography>
 
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2.5 }}> {/* Hata mesajı için de Stack spacing'e uygun boşluk */}
+            <Alert severity="error" sx={{ width: '100%', mb: 2.5 }}>
               {error}
             </Alert>
           )}
 
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ width: '100%', mt: 1 }}>
-            {/* Form elemanlarını Stack ile sarmalayarak dikey boşlukları kontrol ediyoruz */}
-            <Stack spacing={2.5}> {/* Dikeyde elemanlar arası boşluk (2.5 * 8px = 20px) */}
-              <Grid container spacing={2}> {/* Ad ve Soyad için yatayda boşluk (2 * 8px = 16px) */}
+            <Stack spacing={2.5}>
+              <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
                     required
@@ -127,6 +105,7 @@ const RegisterPage = () => {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     error={!!(error && error.toLowerCase().includes('adınız'))}
+                    disabled={loading}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -140,6 +119,7 @@ const RegisterPage = () => {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     error={!!(error && error.toLowerCase().includes('soyadınız'))}
+                    disabled={loading}
                   />
                 </Grid>
               </Grid>
@@ -150,11 +130,12 @@ const RegisterPage = () => {
                 id="email"
                 label="E-posta Adresi"
                 name="email"
-                type="email" // Tarayıcıya e-posta olduğunu belirtmek için
+                type="email"
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={!!(error && (error.toLowerCase().includes('e-posta') || error.toLowerCase().includes('email')))}
+                disabled={loading}
               />
               <TextField
                 required
@@ -167,6 +148,7 @@ const RegisterPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 error={!!(error && (error.toLowerCase().includes('şifre') && !error.toLowerCase().includes('eşleşmiyor')))}
+                disabled={loading}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -176,6 +158,7 @@ const RegisterPage = () => {
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
                         color={showPassword ? "primary" : "default"}
+                        disabled={loading}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -194,6 +177,7 @@ const RegisterPage = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 error={!!(error && (error.toLowerCase().includes('şifreler eşleşmiyor') || (error.toLowerCase().includes('şifreyi onayla') && !error.toLowerCase().includes('eşleşmiyor'))))}
+                disabled={loading}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -203,6 +187,7 @@ const RegisterPage = () => {
                         onMouseDown={handleMouseDownConfirmPassword}
                         edge="end"
                         color={showConfirmPassword ? "primary" : "default"}
+                        disabled={loading}
                       >
                         {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -210,7 +195,6 @@ const RegisterPage = () => {
                   ),
                 }}
               />
-              {/* Kullanım koşulları ve hata mesajını bir arada tutmak için Box */}
               <Box>
                 <FormControlLabel
                   control={
@@ -219,13 +203,30 @@ const RegisterPage = () => {
                       onChange={(e) => setAgreeToTerms(e.target.checked)}
                       name="agreeToTerms"
                       color="primary"
+                      disabled={loading}
                     />
                   }
                   label={
                     <Typography variant="body2" color="text.secondary">
-                      <Link href="/terms" target="_blank" rel="noopener noreferrer">Kullanım Koşulları</Link>
+                      <MuiLink
+                        href="/terms" // Bu sayfaların da oluşturulması gerekir
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => { if(loading) e.preventDefault();}} // Yükleme sırasında linke tıklamayı engelle
+                        sx={loading ? {pointerEvents: 'none', color: 'text.disabled'} : {}}
+                      >
+                        Kullanım Koşulları
+                      </MuiLink>
                       {' ve '}
-                      <Link href="/privacy" target="_blank" rel="noopener noreferrer">Gizlilik Politikası</Link>
+                      <MuiLink
+                        href="/privacy" // Bu sayfaların da oluşturulması gerekir
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => { if(loading) e.preventDefault();}}
+                        sx={loading ? {pointerEvents: 'none', color: 'text.disabled'} : {}}
+                      >
+                        Gizlilik Politikası
+                      </MuiLink>
                       'nı okudum ve kabul ediyorum.
                     </Typography>
                   }
@@ -243,9 +244,10 @@ const RegisterPage = () => {
                 variant="contained"
                 color="primary"
                 size="large"
-                sx={{ py: 1.5 }} // Buton içi dikey padding, mt/mb Stack'ten gelecek
+                sx={{ py: 1.5, position: 'relative' }}
+                disabled={loading}
               >
-                Kayıt Ol
+                {loading ? <CircularProgress size={24} color="inherit" sx={{position: 'absolute'}}/> : 'Kayıt Ol'}
               </Button>
 
               <Divider>
@@ -262,17 +264,23 @@ const RegisterPage = () => {
                 onClick={handleGoogleLogin}
                 size="large"
                 sx={{ borderColor: 'divider' }}
+                disabled={loading}
               >
                 Google ile Kayıt Ol
               </Button>
 
               <Typography variant="body2" color="text.secondary" align="center">
                 Zaten bir hesabınız var mı?{' '}
-                <Link href="/login" /* onClick={() => navigate('/login')} */>
+                <MuiLink
+                  component="button"
+                  variant="body2"
+                  onClick={() => navigate('/login')}
+                  disabled={loading}
+                >
                   Giriş Yapın
-                </Link>
+                </MuiLink>
               </Typography>
-            </Stack> {/* Stack sonu */}
+            </Stack>
           </Box>
         </Paper>
         <Typography variant="caption" color="rgba(255,255,255,0.7)" align="center" sx={{ mt: 4, display: 'block' }}>
