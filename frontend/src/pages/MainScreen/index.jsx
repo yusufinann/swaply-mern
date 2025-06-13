@@ -23,7 +23,7 @@ const MainScreen = () => {
   }, []);
 
   return (
-    <Box sx={{ backgroundColor: theme.palette.background.default, minHeight: '100vh' }}>
+    <Box sx={{ backgroundColor: theme.palette.background.default }}>
       
       <HeroSection 
         theme={theme} 

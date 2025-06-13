@@ -22,7 +22,7 @@ const Navbar = () => {
         </Box>
 
         {/* Navigation Buttons */}
-        <Box sx={{ display: 'flex', gap: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}> {/* Reduced gap slightly for more buttons */}
           <Button
             component={RouterLink}
             to="/urun-yukle"
@@ -52,17 +52,36 @@ const Navbar = () => {
             to="/login"
             variant="contained"
             sx={{
-              backgroundColor: '#2196f3',
-              color: 'white', // Ensure text is visible
+              backgroundColor: '#2196f3', // Blue for Login
+              color: 'white',
               textTransform: 'none',
               borderRadius: '20px',
+              fontSize: '15px', // Adjusted font size slightly
               px: 3,
               '&:hover': {
-                backgroundColor: '#1976d2', // Darker shade on hover
+                backgroundColor: '#1976d2', 
               }
             }}
           >
             Giriş Yap
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/register" // Route for Sign Up page
+            variant="contained"
+            sx={{
+              backgroundColor: '#4caf50', // Green for Sign Up
+              color: 'white',
+              textTransform: 'none',
+              borderRadius: '20px',
+              fontSize: '15px', // Adjusted font size slightly
+              px: 3,
+              '&:hover': {
+                backgroundColor: '#388e3c', // Darker green on hover
+              }
+            }}
+          >
+            Kayıt Ol
           </Button>
         </Box>
       </Toolbar>
