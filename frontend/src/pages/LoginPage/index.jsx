@@ -54,7 +54,7 @@ const LoginPage = () => {
   }
 
   if (isAuthenticated) {
-    const from = location.state?.from?.pathname || '/ana-sayfa';
+    const from = location.state?.from?.pathname || '/';
     return <Navigate to={from} replace />;
   }
 

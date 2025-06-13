@@ -28,7 +28,7 @@ const HomePage = () => {
           </>
         )}
         {isAuthenticated && ( // Kullanıcı giriş yapmışsa ana sayfaya yönlendirme butonu
-           <Button component={RouterLink} to="/ana-sayfa" variant="contained" color="secondary" sx={{ px: 4, py: 1.5, fontSize: '1rem' }}>
+           <Button component={RouterLink} to="/" variant="contained" color="secondary" sx={{ px: 4, py: 1.5, fontSize: '1rem' }}>
              Uygulamaya Git
            </Button>
         )}

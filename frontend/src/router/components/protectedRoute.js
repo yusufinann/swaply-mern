@@ -1,9 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../../shared/context/AuthContext";
-import LoadingFallback from "./LoadingFallback";
-
-// JWT token'ı decode eden yardımcı fonksiyon
+import { useAuth } from "../../shared/context/AuthContext"; 
+import LoadingFallback from "./LoadingFallback"; 
 const parseJwt = (token) => {
   try {
     const base64Url = token.split(".")[1];
@@ -16,15 +14,16 @@ const parseJwt = (token) => {
     );
     return JSON.parse(jsonPayload);
   } catch (error) {
+    console.error("Invalid JWT token:", error);
     return null;
   }
 };
 
 const ProtectedRoute = ({ children }) => {
-  const { token, logout, loading: authContextLoading } = useAuth(); 
+  const { token, logout, loading: authContextLoading } = useAuth();
 
   if (authContextLoading) {
-    return <LoadingFallback />; 
+    return <LoadingFallback />;
   }
 
   if (!token) {
@@ -34,10 +33,10 @@ const ProtectedRoute = ({ children }) => {
   const decoded = parseJwt(token);
   if (!decoded || decoded.exp * 1000 < Date.now()) {
     logout(); 
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />; 
   }
 
-  return children;
+  return children; 
 };
 
 export default ProtectedRoute;

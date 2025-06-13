@@ -26,7 +26,7 @@ export const useLoginPage = () => {
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       await login(response.data.user, response.data.token);
-      navigate('/ana-sayfa');
+      navigate('/');
     } catch (err) {
       console.error('Login error:', err.response?.data || err.message);
       if (err.response && err.response.data && err.response.data.message) {

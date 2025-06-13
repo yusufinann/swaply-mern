@@ -4,7 +4,7 @@ import { AppBar, Toolbar, Typography, Button, Box, useTheme, IconButton, Avatar,
 import { Cached, Logout, AccountCircle, Settings } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom'; // useLocation kaldırıldı
 import { useAuth } from '../shared/context/AuthContext';
-
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 const Navbar = () => {
   const theme = useTheme();
   const { isAuthenticated, user, logout } = useAuth();
@@ -26,7 +26,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     handleCloseUserMenu();
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleProfile = () => {
@@ -34,7 +34,7 @@ const Navbar = () => {
     if (user && user._id) {
       navigate(`/profil/${user._id}`);
     } else {
-      navigate('/profil'); // Genel bir profil yolu veya hata yönetimi
+      navigate('/profil');
     }
   };
 
@@ -49,7 +49,7 @@ const Navbar = () => {
         {/* Logo/Brand */}
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
           <RouterLink to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-            <Cached sx={{ mr: 1, color: '#4caf50', fontSize: '2.5rem' }} />
+                     <SwapHorizIcon sx={{ mr: 1, color: '#4caf50', fontSize: '2.5rem' }}/>
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold', display: { xs: 'none', sm: 'block' } }}>
               Takasta
             </Typography>
@@ -61,7 +61,7 @@ const Navbar = () => {
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
             <Button
               component={RouterLink}
-              to="/ana-sayfa" // MainScreen'e yönlendirme
+              to="/" // MainScreen'e yönlendirme
               color="inherit"
               sx={{ textTransform: 'none', fontSize: '1rem' }}
             >
