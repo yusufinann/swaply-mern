@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // .env değişkenlerini yükle
+dotenv.config(); 
 
 import http from 'http';
 import express from 'express';
@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import connectToMongoDb from './db/connectToMongoDb.js';
 import authRoutes from './routes/auth.routes.js'; 
 import config from './config/config.js'; 
-
+import itemRoutes from './routes/item.routes.js'; 
 const app = express();
 
 
@@ -29,7 +29,7 @@ app.get('/', (req, res) => res.send('Merhaba, Takasta backend API çalışıyor!
 
 // API Rotaları
 app.use('/api/auth', authRoutes); 
-
+app.use('/api/items', itemRoutes);
 app.use((err, req, res, next) => {
   console.error("Beklenmeyen Hata:", err.stack);
   const statusCode = err.statusCode || 500;

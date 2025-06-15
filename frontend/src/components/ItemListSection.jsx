@@ -1,48 +1,133 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  Grow,
-  Button,
-  Chip
-} from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Typography, Grid, Grow, Button, CircularProgress, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FeaturedItemCard from './MainScreen/FeaturedItemCard';
+import { useTheme } from '@mui/material/styles';
+import { getAllAvailableItems } from '../services/itemService';
 
 const ItemListSection = ({
-  theme,
-  visible,
-  items,
   title,
   subtitle,
   onClearCategory,
-  showViewMore = false,
-  viewMoreAction,
-  viewMoreText = "Daha Fazla Ürün Gör"
+  categoryFilter,
+  searchQuery,
+  itemsPerPage = 8,
 }) => {
+  const theme = useTheme();
+  const [internalItems, setInternalItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
 
-  if (!items || items.length === 0) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showViewMore, setShowViewMore] = useState(false);
+
+  useEffect(() => {
+    const fetchItems = async (pageToFetch = 1) => {
+      setLoading(true);
+      if (pageToFetch === 1) setError(null); // Reset error only on initial load/filter change
+
+      try {
+        const params = { page: pageToFetch, limit: itemsPerPage };
+        if (categoryFilter) params.category = categoryFilter;
+        if (searchQuery) params.search = searchQuery;
+
+        const response = await getAllAvailableItems(params);
+        if (response.success) {
+          setInternalItems(prevItems => pageToFetch === 1 ? response.data : [...prevItems, ...response.data]);
+          setTotalPages(response.totalPages || 1);
+          setCurrentPage(response.currentPage || pageToFetch);
+          setShowViewMore((response.currentPage || pageToFetch) < (response.totalPages || 1));
+        } else {
+          setError(response.message || "Ürünler yüklenemedi.");
+          if (pageToFetch === 1) setInternalItems([]);
+        }
+      } catch (err) {
+        setError(err.message || "Bir hata oluştu.");
+        if (pageToFetch === 1) setInternalItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems(1);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryFilter, searchQuery, itemsPerPage]);
+
+  const handleLoadMore = () => {
+    if (currentPage < totalPages && !loading) {
+      const nextPage = currentPage + 1;
+      // Re-trigger fetch logic for the next page
+      fetchMoreItems(nextPage);
+    }
+  };
+  
+  const fetchMoreItems = async (page) => {
+      setLoading(true);
+      try {
+        const params = { page, limit: itemsPerPage };
+        if (categoryFilter) params.category = categoryFilter;
+        if (searchQuery) params.search = searchQuery;
+        
+        const response = await getAllAvailableItems(params);
+        if (response.success) {
+          setInternalItems(prevItems => [...prevItems, ...response.data]);
+          setCurrentPage(response.currentPage || page);
+          setTotalPages(response.totalPages || totalPages); // Keep existing if not returned
+          setShowViewMore((response.currentPage || page) < (response.totalPages || totalPages));
+        } else {
+          console.error("Daha fazla ürün yüklenemedi:", response.message);
+          // Optionally show a snackbar for load more errors
+        }
+      } catch (err) {
+        console.error("Daha fazla ürün yüklenirken hata:", err.message);
+      } finally {
+        setLoading(false);
+      }
+  };
+
+  if (loading && currentPage === 1 && internalItems.length === 0) {
+    return (
+      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 }, textAlign: 'center' }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{mt: 2}}>Ürünler yükleniyor...</Typography>
+      </Container>
+    );
+  }
+
+  if (!loading && error && internalItems.length === 0) {
+     return (
+      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
+        <Box sx={{ textAlign: 'center', mb: 6 }}>
+          {onClearCategory && (
+            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 4 }}>
+              Geri Dön
+            </Button>
+          )}
+           <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
+          </Typography>
+          <Alert severity="error" sx={{mt: 2}}>{error}</Alert>
+        </Box>
+      </Container>
+     );
+  }
+
+  if (!loading && internalItems.length === 0 && !error) {
     return (
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           {onClearCategory && (
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              onClick={onClearCategory}
-              sx={{ mb: 4 }}
-            >
+            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 4 }}>
               Geri Dön
             </Button>
           )}
           <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-            {title}
+            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
           </Typography>
           <Typography variant="h6" color="text.secondary">
-            Bu kategoride henüz ürün bulunmamaktadır.
+            {searchQuery ? `"${searchQuery}" için sonuç bulunamadı.` : "Görünüşe göre burada hiç ürün yok!"}
           </Typography>
         </Box>
       </Container>
@@ -50,21 +135,16 @@ const ItemListSection = ({
   }
 
   return (
-    <Box sx={{ backgroundColor: theme.palette.background.paper, py: { xs: 1, md: 3 } }}>
+    <Box sx={{ backgroundColor: theme.palette.background.paper, py: { xs: 3, md: 5 } }}>
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Box sx={{ textAlign: 'center', mb: {xs: 4, md: 6} }}>
           {onClearCategory && (
-            <Button
-              variant="outlined"
-              startIcon={<ArrowBackIcon />}
-              onClick={onClearCategory}
-              sx={{ mb: 4 }}
-            >
-              Geri Dön
+            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 3 }}>
+              Tüm Kategorilere Dön
             </Button>
           )}
-          <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-            {title}
+          <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', mb: 1.5, fontSize: {xs: '2rem', sm: '2.5rem'} }}>
+            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Keşfet")}
           </Typography>
           {subtitle && (
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
@@ -73,23 +153,20 @@ const ItemListSection = ({
           )}
         </Box>
 
-        <Grid container spacing={4}>
-          {items.map((item, index) => (
+        <Grid container spacing={{xs: 2, sm: 3, md: 4}}>
+          {internalItems.map((item, index) => (
             <Grid
-              item
-              xs={12}
-              sm={6}
-              md={3}
-              key={item.id}
-              onMouseEnter={() => setHoveredCard(item.id)}
+              item xs={12} sm={6} md={4} lg={3}
+              key={item._id || index}
+              onMouseEnter={() => setHoveredCard(item._id)}
               onMouseLeave={() => setHoveredCard(null)}
             >
-              <Grow in={visible} timeout={800 + index * 150}>
+              <Grow in={true} timeout={300 + index * 100} style={{ transformOrigin: '0 0 0' }}>
                 <div>
                   <FeaturedItemCard
                     item={item}
                     theme={theme}
-                    isHovered={hoveredCard === item.id}
+                    isHovered={hoveredCard === item._id}
                   />
                 </div>
               </Grow>
@@ -97,16 +174,17 @@ const ItemListSection = ({
           ))}
         </Grid>
 
-        {showViewMore && items.length > 0 && (
-          <Box sx={{ textAlign: 'center', mt: 6 }}>
+        {showViewMore && internalItems.length > 0 && currentPage < totalPages && (
+          <Box sx={{ textAlign: 'center', mt: {xs: 4, md: 6} }}>
             <Button
               variant="contained"
               color="primary"
               size="large"
-              sx={{ borderRadius: 3, px: 6 }}
-              onClick={viewMoreAction || (() => console.log('View More Clicked'))}
+              sx={{ borderRadius: 3, px: 6, py: 1.5 }}
+              onClick={handleLoadMore}
+              disabled={loading}
             >
-              {viewMoreText}
+              {loading && currentPage > 1 && internalItems.length > 0 ? <CircularProgress size={24} color="inherit"/> : "Daha Fazla Yükle"}
             </Button>
           </Box>
         )}
@@ -116,17 +194,8 @@ const ItemListSection = ({
 };
 
 ItemListSection.defaultProps = {
-  visible: true,
-  items: [],
-  title: "Ürünler",
-  theme: {
-    palette: {
-      background: { paper: '#fff' },
-      primary: { main: '#1976d2' },
-      secondary: { light: '#ba68c8', contrastText: '#fff' },
-      text: { secondary: 'rgba(0,0,0,0.6)' }
-    }
-  }
+  title: "Öne Çıkan Ürünler",
+  itemsPerPage: 8,
 };
 
 export default ItemListSection;

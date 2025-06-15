@@ -1,5 +1,5 @@
-// src/pages/LoadProductPage/index.jsx
-import React, { useState } from 'react';
+// src/pages/EditProductPage/index.jsx
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Container,
   Typography,
@@ -16,52 +16,101 @@ import {
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useNavigate } from 'react-router-dom';
-import { createItem as createItemApi } from '../../services/itemService'; // Correctly import your API service
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getItemById as getItemByIdApi, updateItem as updateItemApi } from '../../services/itemService';
 
 const ITEM_CATEGORIES = ['Books', 'Electronics', 'Clothing', 'Furniture', 'Home Goods', 'Toys & Games', 'Sports & Outdoors', 'Collectibles & Art', 'Other'];
 
-const LoadProductPage = () => {
+const EditProductPage = () => {
   const navigate = useNavigate();
+  const { id: itemId } = useParams(); // Get item ID from URL
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
-  const [images, setImages] = useState(['']);
-  const [tags, setTags] = useState([]);
+  const [initialLoading, setInitialLoading] = useState(true); // For fetching initial item data
+  const [formValues, setFormValues] = useState({
+    title: '',
+    description: '', // What the user wants in return
+    category: '',
+    location: '',
+    images: [''],
+    tags: [],
+    status: 'Available', // Include status if editable
+  });
   const [currentTag, setCurrentTag] = useState('');
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // For form submission
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  const populateForm = useCallback((item) => {
+    setFormValues({
+      title: item.title || '',
+      description: item.description || '', // This is for "desiredItems"
+      category: item.category || '',
+      location: item.location || '',
+      images: item.images && item.images.length > 0 ? item.images : [''],
+      tags: item.tags || [],
+      status: item.status || 'Available',
+    });
+  }, []);
+
+  useEffect(() => {
+    const fetchItemData = async () => {
+      if (!itemId) {
+        setError("Ürün ID'si bulunamadı.");
+        setInitialLoading(false);
+        return;
+      }
+      setInitialLoading(true);
+      setError(null);
+      try {
+        const response = await getItemByIdApi(itemId);
+        if (response.success && response.data) {
+          populateForm(response.data);
+        } else {
+          setError(response.message || "Ürün bilgileri yüklenemedi.");
+        }
+      } catch (err) {
+        setError(err.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
+      } finally {
+        setInitialLoading(false);
+      }
+    };
+    fetchItemData();
+  }, [itemId, populateForm]);
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleImageChange = (index, value) => {
-    const newImages = [...images];
+    const newImages = [...formValues.images];
     newImages[index] = value;
-    setImages(newImages);
+    setFormValues(prev => ({ ...prev, images: newImages }));
   };
 
   const addImageField = () => {
-    if (images.length < 5) {
-      setImages([...images, '']);
+    if (formValues.images.length < 5) {
+      setFormValues(prev => ({ ...prev, images: [...prev.images, ''] }));
     }
   };
 
   const removeImageField = (index) => {
-    const newImages = images.filter((_, i) => i !== index);
-    setImages(newImages.length > 0 ? newImages : ['']);
+    const newImages = formValues.images.filter((_, i) => i !== index);
+    setFormValues(prev => ({ ...prev, images: newImages.length > 0 ? newImages : [''] }));
   };
 
   const handleAddTag = () => {
-    if (currentTag && !tags.includes(currentTag.trim()) && tags.length < 5) {
-      setTags([...tags, currentTag.trim()]);
+    if (currentTag && !formValues.tags.includes(currentTag.trim()) && formValues.tags.length < 5) {
+      setFormValues(prev => ({ ...prev, tags: [...prev.tags, currentTag.trim()] }));
       setCurrentTag('');
     }
   };
 
   const handleDeleteTag = (tagToDelete) => {
-    setTags(tags.filter(tag => tag !== tagToDelete));
+    setFormValues(prev => ({ ...prev, tags: prev.tags.filter(tag => tag !== tagToDelete) }));
   };
 
   const handleSubmit = async (event) => {
@@ -69,57 +118,57 @@ const LoadProductPage = () => {
     setError(null);
     setSuccess(null);
 
-    if (!title || !category) {
+    if (!formValues.title || !formValues.category) {
       setError('Başlık ve Kategori alanları zorunludur.');
       return;
     }
 
-    const filteredImages = images.map(img => img.trim()).filter(img => img !== '');
+    const filteredImages = formValues.images.map(img => img.trim()).filter(img => img !== '');
 
-    const itemData = {
-      title: title.trim(),
-      description: description.trim(),
-      category,
-      location: location.trim(),
+    const itemDataToUpdate = {
+      title: formValues.title.trim(),
+      description: formValues.description.trim(),
+      category: formValues.category,
+      location: formValues.location.trim(),
       images: filteredImages,
-      tags,
+      tags: formValues.tags,
+      status: formValues.status,
     };
 
     setLoading(true);
     try {
-      // Use the imported createItemApi service function
-      const response = await createItemApi(itemData);
-      
-      if (response.success) { // Assuming your API returns { success: true, data: ... }
-        setSuccess('Ürününüz başarıyla yüklendi! Takaslarım sayfasına yönlendiriliyorsunuz...');
-        // Clear form
-        setTitle('');
-        setDescription('');
-        setCategory('');
-        setLocation('');
-        setImages(['']);
-        setTags([]);
-        setCurrentTag('');
+      const response = await updateItemApi(itemId, itemDataToUpdate);
+      if (response.success) {
+        setSuccess('Ürününüz başarıyla güncellendi! Takaslarım sayfasına yönlendiriliyorsunuz...');
         setTimeout(() => {
           navigate('/takasta');
         }, 2000);
       } else {
-        // If API returns { success: false, message: '...' } even on 2xx for logical errors
-        setError(response.message || 'Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+        setError(response.message || 'Ürün güncellenirken bir hata oluştu.');
       }
     } catch (err) {
-      // Error is now whatever was thrown by itemService (either response.data or generic error)
-      // The apiClient interceptor already console.error's it.
       setError(err.message || 'Sunucuyla iletişim kurulamadı veya beklenmeyen bir hata oluştu.');
     } finally {
       setLoading(false);
     }
   };
 
+  if (initialLoading) {
+    return (
+      <Container sx={{ textAlign: 'center', py: 5 }}>
+        <CircularProgress />
+        <Typography variant="h6" sx={{ mt: 2 }}>Ürün bilgileri yükleniyor...</Typography>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/takasta')} sx={{ mb: 2 }}>
+        Takaslarıma Dön
+      </Button>
       <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'center', fontWeight: 'bold', mb: 4 }}>
-        Yeni Ürün Yükle
+        Ürünü Düzenle
       </Typography>
 
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
@@ -127,7 +176,6 @@ const LoadProductPage = () => {
         {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
         <Grid container spacing={3}>
-          {/* Title */}
           <Grid item xs={12}>
             <TextField
               required
@@ -135,14 +183,12 @@ const LoadProductPage = () => {
               id="title"
               label="Ürün Başlığı"
               name="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={formValues.title}
+              onChange={handleInputChange}
               disabled={loading}
-              helperText="Takas etmek istediğiniz ürünün adı (örn: Kırmızı Bisiklet, Antika Saat)"
             />
           </Grid>
 
-          {/* Description (Wants) */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -151,55 +197,65 @@ const LoadProductPage = () => {
               name="description"
               multiline
               rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formValues.description}
+              onChange={handleInputChange}
               disabled={loading}
-              helperText="Bu ürün karşılığında ne tür ürünlerle takas yapmak istersiniz? (örn: Benzer değerde bir tablet, Mutfak robotu, Koleksiyonluk figürler)"
             />
           </Grid>
 
-          {/* Category */}
           <Grid item xs={12} sm={6}>
             <TextField
               required
               fullWidth
               id="category"
+              name="category"
               select
               label="Kategori"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              value={formValues.category}
+              onChange={handleInputChange}
               disabled={loading}
-              helperText="Ürününüzün ait olduğu kategoriyi seçin."
             >
-              <MenuItem value="">
-                <em>Kategori Seçin</em>
-              </MenuItem>
+              <MenuItem value=""><em>Kategori Seçin</em></MenuItem>
               {ITEM_CATEGORIES.map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  {cat}
-                </MenuItem>
+                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
               ))}
             </TextField>
           </Grid>
-
-          {/* Location */}
+          
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
               id="location"
               label="Konum (İlçe, Şehir)"
               name="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              value={formValues.location}
+              onChange={handleInputChange}
               disabled={loading}
-              helperText="Takasın gerçekleşebileceği genel konum (örn: Kadıköy, İstanbul)"
             />
           </Grid>
 
-          {/* Images */}
+           <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              id="status"
+              name="status"
+              select
+              label="Durum"
+              value={formValues.status}
+              onChange={handleInputChange}
+              disabled={loading}
+              helperText="Ürünün mevcut takas durumu."
+            >
+              <MenuItem value="Available">Takasa Açık</MenuItem>
+              <MenuItem value="Pending">Takas Beklemede</MenuItem>
+              <MenuItem value="Swapped">Takaslandı</MenuItem>
+            </TextField>
+          </Grid>
+
+
           <Grid item xs={12}>
             <Typography variant="subtitle1" gutterBottom sx={{mt:1}}>Ürün Resimleri (URL)</Typography>
-            {images.map((imgUrl, index) => (
+            {formValues.images.map((imgUrl, index) => (
               <Box key={index} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <TextField
                   fullWidth
@@ -212,30 +268,29 @@ const LoadProductPage = () => {
                   sx={{ mr: 1 }}
                   placeholder="https://example.com/image.jpg"
                 />
-                {images.length > 1 && (
+                {formValues.images.length > 1 && (
                   <IconButton onClick={() => removeImageField(index)} color="error" disabled={loading}>
                     <DeleteIcon />
                   </IconButton>
                 )}
               </Box>
             ))}
-            {images.length < 5 && (
+            {formValues.images.length < 5 && (
               <Button
                 size="small"
                 startIcon={<AddPhotoAlternateIcon />}
                 onClick={addImageField}
-                disabled={loading || images.length >= 5}
+                disabled={loading || formValues.images.length >= 5}
                 variant="outlined"
               >
                 Başka Resim Ekle (URL)
               </Button>
             )}
-             <Typography variant="caption" display="block" color="textSecondary" sx={{mt: 0.5}}>
-                En fazla 5 resim URL'si ekleyebilirsiniz. Gerçek bir uygulamada dosya yükleme özelliği olurdu.
+            <Typography variant="caption" display="block" color="textSecondary" sx={{mt: 0.5}}>
+                En fazla 5 resim URL'si ekleyebilirsiniz.
             </Typography>
           </Grid>
 
-          {/* Tags */}
           <Grid item xs={12}>
             <Typography variant="subtitle1" gutterBottom sx={{mt:1}}>Etiketler</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1}}>
@@ -247,25 +302,22 @@ const LoadProductPage = () => {
                     value={currentTag}
                     onChange={(e) => setCurrentTag(e.target.value)}
                     onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                            e.preventDefault();
-                            handleAddTag();
-                        }
+                        if (e.key === 'Enter') { e.preventDefault(); handleAddTag(); }
                     }}
-                    disabled={loading || tags.length >= 5}
+                    disabled={loading || formValues.tags.length >= 5}
                     sx={{ mr: 1 }}
                 />
                 <Button
                     variant="outlined"
                     onClick={handleAddTag}
-                    disabled={loading || tags.length >= 5 || !currentTag.trim()}
+                    disabled={loading || formValues.tags.length >= 5 || !currentTag.trim()}
                     startIcon={<AddCircleOutlineIcon />}
                 >
                     Ekle
                 </Button>
             </Box>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {tags.map((tag) => (
+                {formValues.tags.map((tag) => (
                 <Chip
                     key={tag}
                     label={tag}
@@ -275,22 +327,21 @@ const LoadProductPage = () => {
                 ))}
             </Box>
              <Typography variant="caption" display="block" color="textSecondary" sx={{mt: 0.5}}>
-                Ürününüzü tanımlayan en fazla 5 etiket ekleyebilirsiniz.
+                En fazla 5 etiket.
             </Typography>
           </Grid>
 
-          {/* Submit Button */}
           <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
             <Button
               type="submit"
               variant="contained"
               color="primary"
               size="large"
-              disabled={loading}
+              disabled={loading || initialLoading}
               sx={{ minWidth: '200px', fontWeight: 'bold', py: 1.5 }}
               startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
             >
-              {loading ? 'Yükleniyor...' : 'Ürünü Takasa Ekle'}
+              {loading ? 'Güncelleniyor...' : 'Değişiklikleri Kaydet'}
             </Button>
           </Grid>
         </Grid>
@@ -299,4 +350,4 @@ const LoadProductPage = () => {
   );
 };
 
-export default LoadProductPage;
+export default EditProductPage;

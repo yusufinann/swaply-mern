@@ -5,10 +5,9 @@ import { Box } from '@mui/material';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
-// Define or import these constants
-const NAVBAR_TOOLBAR_HEIGHT = 30;
-const CATEGORY_ICON_BAR_HEIGHT = 20;
-const TOTAL_NAVBAR_HEIGHT = NAVBAR_TOOLBAR_HEIGHT + CATEGORY_ICON_BAR_HEIGHT;
+const ACTUAL_NAVBAR_TOOLBAR_HEIGHT = 64;
+const ACTUAL_CATEGORY_ICON_BAR_HEIGHT = 60;
+const TOTAL_NAVBAR_HEIGHT_FOR_PADDING = ACTUAL_NAVBAR_TOOLBAR_HEIGHT + ACTUAL_CATEGORY_ICON_BAR_HEIGHT;
 
 const MainAppLayout = () => {
   return (
@@ -17,13 +16,17 @@ const MainAppLayout = () => {
       <Box
         component="main"
         sx={{
-          paddingTop: `${TOTAL_NAVBAR_HEIGHT}px`,
-          // Add other styling as needed for your layout
+          paddingTop: `${TOTAL_NAVBAR_HEIGHT_FOR_PADDING}px`,
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: `calc(100vh - ${TOTAL_NAVBAR_HEIGHT_FOR_PADDING}px)`,
         }}
       >
-        <Outlet />
+        <Box sx={{ flexGrow: 1 }}>
+          <Outlet />
+        </Box>
+        <Footer />
       </Box>
-      <Footer/>
     </>
   );
 };

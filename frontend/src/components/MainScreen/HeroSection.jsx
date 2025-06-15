@@ -42,7 +42,7 @@ const HeroSection = ({ theme, visible }) => {
         minHeight: { xs: '20vh', md: '35vh' },
         display: 'flex',
         alignItems: 'center',
-        mt: 10,
+        mt:2,
         mr: { xs: 2, sm: 4, md: 10 },
         ml: { xs: 2, sm: 4, md: 10 },
         borderTopRightRadius:'50px',
