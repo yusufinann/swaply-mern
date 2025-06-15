@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Grid, Grow, Button, CircularProgress, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import FeaturedItemCard from './MainScreen/FeaturedItemCard';
+import FeaturedItemCard from './FeaturedItemCard';
 import { useTheme } from '@mui/material/styles';
-import { getAllAvailableItems } from '../services/itemService';
+import { getAllAvailableItems } from '../../../services/itemService';
 
 const ItemListSection = ({
   title,

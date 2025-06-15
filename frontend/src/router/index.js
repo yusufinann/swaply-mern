@@ -7,8 +7,8 @@ import MainAppLayout from '../layouts/MainAppLayout';
 import theme from '../theme/index';
 import ProtectedRoute from './components/protectedRoute.js';
 import LoadingFallback from './components/LoadingFallback.js';
-import MySwappableItemsPage from '../components/MainScreen/MySwappableItemsPage.jsx';
 import EditProductPage from '../pages/EditProductPage/index.jsx';
+import MySwappableItemsPage from '../pages/MySwappableItemsPage/index.jsx';
 
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage/index.jsx'));

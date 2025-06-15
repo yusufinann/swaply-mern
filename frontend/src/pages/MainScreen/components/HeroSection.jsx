@@ -9,7 +9,7 @@ import {
   Fade,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { slides } from '../../constants/datas'; // Assuming this path is correct
+import { slides } from '../../../constants/datas'; // Assuming this path is correct
 
 const HeroSection = ({ theme, visible }) => {
   const [currentSlide, setCurrentSlide] = useState(0);

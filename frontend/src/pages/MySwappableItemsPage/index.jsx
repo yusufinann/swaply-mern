@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { useNavigate } from 'react-router-dom';
-import UserItemCard from './UserItemCard';
+import UserItemCard from '../MainScreen/components/UserItemCard';
 import { getMyItems as getMyItemsApi, deleteItem as deleteItemApi } from '../../services/itemService'; // Import actual API calls
 
 const MySwappableItemsPage = () => {

@@ -3,11 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Box, useTheme, Fab } from '@mui/material';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useParams, useNavigate } from 'react-router-dom';
-
-import HeroSection from '../../components/MainScreen/HeroSection';
-import HowItWorksSection from '../../components/MainScreen/HowItWorksSection';
+import HeroSection from './components/HeroSection';
+import HowItWorksSection from './components/HowItWorksSection';
 import ScrollTop from '../../components/common/ScrollTop';
-import ItemListSection from '../../components/ItemListSection';
+import ItemListSection from './components/ItemListSection';
 
 import {
   categories as allCategoriesData,

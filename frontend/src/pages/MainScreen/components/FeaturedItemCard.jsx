@@ -13,7 +13,7 @@ import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useAuth } from '../../shared/context/AuthContext';
+import { useAuth } from '../../../shared/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 // Basic date formatter without date-fns
