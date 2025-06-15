@@ -9,37 +9,15 @@ import {
   Fade,
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { slides } from '../../constants/datas'; // Assuming this path is correct
 
 const HeroSection = ({ theme, visible }) => {
-  const slides = [
-    {
-      title: "Paranı Harcama, Takasta Kazan!",
-      subtitle: "Fazlalık eşyalarınla hayallerindeki ürünlere ulaş. Sürdürülebilir ve ekonomik."
-    },
-    {
-      title: "Birinin Çöpü, Başkasının Hazinesi",
-      subtitle: "Kullanmadığın eşyalar başkalarının tam ihtiyacı olabilir. Takasla kazan!"
-    },
-    {
-      title: "Değiş Tokuş, Değer Kazan",
-      subtitle: "Para harcamadan istediğin ürünlere sahip ol. Akıllı takasın adresi."
-    },
-    {
-      title: "Sürdürülebilir Yaşam Başlıyor",
-      subtitle: "Çevreye dost, cebine uygun. Takasla hem tasarruf et hem doğayı koru."
-    },
-    {
-      title: "Eşyalarına Yeni Hayat Ver",
-      subtitle: "Evindeki fazlalıklar başka birinin eksikliğini tamamlasın. Takas yap, mutlu ol!"
-    }
-  ];
-
   const [currentSlide, setCurrentSlide] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
 
   useEffect(() => {
-    if (!visible) return;
-    
+    if (!visible || slides.length <= 1) return;
+
     const interval = setInterval(() => {
       setFadeIn(false);
       setTimeout(() => {
@@ -50,6 +28,7 @@ const HeroSection = ({ theme, visible }) => {
 
     return () => clearInterval(interval);
   }, [visible, slides.length]);
+
   return (
     <Box
       sx={{
@@ -60,19 +39,22 @@ const HeroSection = ({ theme, visible }) => {
         color: theme.palette.primary.contrastText,
         position: 'relative',
         overflow: 'hidden',
-        minHeight: { xs: '60vh', md: '50vh' },
+        minHeight: { xs: '20vh', md: '35vh' },
         display: 'flex',
         alignItems: 'center',
+        mt: 10,
+        mr: { xs: 2, sm: 4, md: 10 },
+        ml: { xs: 2, sm: 4, md: 10 },
+        borderTopRightRadius:'50px',
+         borderTopLeftRadius:'50px'
       }}
     >
-      {/* Minimal decorative element */}
       <Box
         sx={{
           position: 'absolute',
-          top: -30,
-          right: -30,
-          width: 120,
-          height: 120,
+          right: -20,
+          width: 100,
+          height: 100,
           borderRadius: '50%',
           background: 'rgba(255,255,255,0.03)',
           animation: 'float 8s ease-in-out infinite',
@@ -84,11 +66,11 @@ const HeroSection = ({ theme, visible }) => {
           <Box
             sx={{
               position: 'relative',
-              minHeight: { xs: '140px', md: '180px' },
+              minHeight: { xs: '100px', sm: '110px', md: '120px' },
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              mb: 2,
+              mb: 0.5,
             }}
           >
             {slides.map((slide, index) => (
@@ -109,7 +91,7 @@ const HeroSection = ({ theme, visible }) => {
                     left: 0,
                     right: 0,
                     fontWeight: 'bold',
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                    fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
                     background:
                       'linear-gradient(45deg, #FFFFFF 30%, #E8F4FD 90%)',
                     backgroundClip: 'text',
@@ -120,7 +102,8 @@ const HeroSection = ({ theme, visible }) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    minHeight: { xs: '140px', md: '180px' },
+                    minHeight: { xs: '100px', sm: '110px', md: '120px' },
+                    px:1,
                   }}
                 >
                   {slide.title}
@@ -134,11 +117,11 @@ const HeroSection = ({ theme, visible }) => {
           <Box
             sx={{
               position: 'relative',
-              minHeight: { xs: '80px', md: '70px' },
+              minHeight: { xs: '50px', sm: '55px', md: '60px' },
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              mb: 3,
+              mb: 1,
             }}
           >
             {slides.map((slide, index) => (
@@ -160,14 +143,15 @@ const HeroSection = ({ theme, visible }) => {
                     right: 0,
                     opacity: 0.85,
                     fontWeight: 300,
-                    fontSize: { xs: '1rem', md: '1.125rem' },
-                    maxWidth: '600px',
+                    fontSize: { xs: '0.95rem', md: '1.1rem' },
+                    maxWidth: '580px',
                     mx: 'auto',
                     textAlign: 'center',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    minHeight: { xs: '80px', md: '70px' },
+                    minHeight: { xs: '50px', sm: '55px', md: '60px' },
+                    px:1,
                   }}
                 >
                   {slide.subtitle}
@@ -177,48 +161,50 @@ const HeroSection = ({ theme, visible }) => {
           </Box>
         </Slide>
 
-        {/* Slide indicator dots */}
-        <Slide direction="up" in={visible} timeout={1400}>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 1,
-              mt: 2,
-              mb: 2,
-            }}
-          >
-            {slides.map((_, index) => (
-              <Box
-                key={index}
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: currentSlide === index 
-                    ? 'rgba(255,255,255,0.8)' 
-                    : 'rgba(255,255,255,0.3)',
-                  transition: 'all 0.3s ease',
-                  cursor: 'pointer',
-                }}
-                onClick={() => {
-                  setFadeIn(false);
-                  setTimeout(() => {
-                    setCurrentSlide(index);
-                    setFadeIn(true);
-                  }, 300);
-                }}
-              />
-            ))}
-          </Box>
-        </Slide>
+        {slides.length > 1 && (
+          <Slide direction="up" in={visible} timeout={1400}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 1,
+                mt: 1.5,
+                mb: 1.5,
+              }}
+            >
+              {slides.map((_, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: currentSlide === index
+                      ? 'rgba(255,255,255,0.9)'
+                      : 'rgba(255,255,255,0.4)',
+                    transition: 'all 0.3s ease',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    if (currentSlide === index) return;
+                    setFadeIn(false);
+                    setTimeout(() => {
+                      setCurrentSlide(index);
+                      setFadeIn(true);
+                    }, 300);
+                  }}
+                />
+              ))}
+            </Box>
+          </Slide>
+        )}
 
         <Slide direction="up" in={visible} timeout={1200}>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
             spacing={2}
             justifyContent="center"
-            sx={{ mt: 3 }}
+            sx={{ mt: 2.5 }}
           >
             <Button
               variant="contained"
@@ -226,10 +212,10 @@ const HeroSection = ({ theme, visible }) => {
               size="large"
               endIcon={<ArrowForwardIcon />}
               sx={{
-                px: 3,
-                py: 1.25,
+                px: {xs: 2.5, sm: 3},
+                py: {xs: 1, sm: 1.25},
                 borderRadius: 2,
-                fontSize: '1rem',
+                fontSize: {xs: '0.9rem', sm: '1rem'},
                 boxShadow: '0 6px 20px rgba(76, 175, 80, 0.25)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
@@ -245,10 +231,10 @@ const HeroSection = ({ theme, visible }) => {
               variant="outlined"
               size="large"
               sx={{
-                px: 3,
-                py: 1.25,
+                px: {xs: 2.5, sm: 3},
+                py: {xs: 1, sm: 1.25},
                 borderRadius: 2,
-                fontSize: '1rem',
+                fontSize: {xs: '0.9rem', sm: '1rem'},
                 color: theme.palette.primary.contrastText,
                 borderColor: 'rgba(255,255,255,0.4)',
                 transition: 'all 0.3s ease',

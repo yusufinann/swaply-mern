@@ -15,10 +15,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField, // For login form in modal
+  TextField,
   Link as MuiLink,
-  CircularProgress, // For loading state in modal
-  Alert, // For error display in modal
+  CircularProgress,
+  Alert,
   Grid
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -28,13 +28,13 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // For modal icon
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import InputAdornment from '@mui/material/InputAdornment';
 
 
-import { useAuth } from '../../shared/context/AuthContext'; // Adjust path
+import { useAuth } from '../../shared/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const FeaturedItemCard = ({ item, theme, isHovered }) => {
@@ -45,12 +45,12 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
   const [modalEmail, setModalEmail] = useState('');
   const [modalPassword, setModalPassword] = useState('');
   const [modalShowPassword, setModalShowPassword] = useState(false);
-  const [modalLoginAttempted, setModalLoginAttempted] = useState(false); // To show errors only after submit
+  const [modalLoginAttempted, setModalLoginAttempted] = useState(false);
 
   const handleOpenLoginModal = () => {
-    if (clearAuthError) clearAuthError(); // Clear any previous auth errors
-    setModalLoginAttempted(false); // Reset attempt flag
-    setModalEmail(''); // Reset fields
+    if (clearAuthError) clearAuthError();
+    setModalLoginAttempted(false);
+    setModalEmail('');
     setModalPassword('');
     setLoginModalOpen(true);
   };
@@ -65,13 +65,11 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
     event.preventDefault();
     setModalLoginAttempted(true);
     if (!modalEmail || !modalPassword) {
-      // Basic client-side validation, AuthContext login should handle more
       return;
     }
     const success = await login(modalEmail, modalPassword);
     if (success) {
       handleCloseLoginModal();
-      // Optionally, you can trigger the offer action again here or just let the UI update
       console.log('Login successful from modal, user can now make offer.');
     }
   };
@@ -79,7 +77,6 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
   const handleOfferClick = () => {
     if (isAuthenticated) {
       console.log('User is authenticated, proceed with offer for item:', item.name);
-      // Example: navigate(`/items/${item.id}/make-offer`);
     } else {
       handleOpenLoginModal();
     }
@@ -88,9 +85,8 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
   const handleChatClick = () => {
     if (isAuthenticated) {
         console.log("User authenticated, opening chat for item:", item.name);
-        // navigate(`/chat/${item.userId}/${item.id}`);
     } else {
-        handleOpenLoginModal(); // Or a different modal/prompt if desired
+        handleOpenLoginModal();
     }
   };
 
@@ -287,7 +283,6 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
         </Box>
       </Card>
 
-      {/* Inline Login Modal */}
       <Dialog
         open={loginModalOpen}
         onClose={handleCloseLoginModal}
@@ -303,7 +298,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
         </DialogTitle>
         <DialogContent>
           <Box component="form" onSubmit={handleModalLoginSubmit} noValidate sx={{ mt: 1 }}>
-            {authError && modalLoginAttempted && ( // Show error from AuthContext
+            {authError && modalLoginAttempted && (
               <Alert severity="error" sx={{ mb: 2 }}>
                 {authError}
               </Alert>
@@ -319,7 +314,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
               autoFocus
               value={modalEmail}
               onChange={(e) => setModalEmail(e.target.value)}
-              error={modalLoginAttempted && !modalEmail} // Basic validation
+              error={modalLoginAttempted && !modalEmail}
               helperText={modalLoginAttempted && !modalEmail ? "E-posta gerekli." : ""}
               disabled={authLoading}
             />
@@ -334,7 +329,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
               autoComplete="current-password"
               value={modalPassword}
               onChange={(e) => setModalPassword(e.target.value)}
-              error={modalLoginAttempted && !modalPassword} // Basic validation
+              error={modalLoginAttempted && !modalPassword}
               helperText={modalLoginAttempted && !modalPassword ? "Şifre gerekli." : ""}
               disabled={authLoading}
               InputProps={{
@@ -369,7 +364,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
                     variant="body2"
                     onClick={() => {
                         handleCloseLoginModal();
-                        navigate('/sifremi-unuttum'); // Or your forgot password route
+                        navigate('/sifremi-unuttum');
                     }}
                     disabled={authLoading}
                 >
@@ -383,7 +378,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
            <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
               Hesabınız yok mu?{' '}
             <MuiLink
-              component="button" // Make it act like a button for onClick
+              component="button"
               variant="body2"
               onClick={() => {
                 handleCloseLoginModal();

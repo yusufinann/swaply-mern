@@ -10,15 +10,13 @@ import {
   Button,
 } from '@mui/material';
 
-const CategoriesSection = ({ theme, visible, categories }) => {
+
+const CategoriesSection = ({ theme, visible, categories, onCategorySelect }) => {
   return (
-    <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 4 } }}>
+      <Box sx={{ textAlign: 'center', mb: 3 }}>
         <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
           Kategoriler
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
-          İstediğin kategoride takas yap. Elektronikten giyime, kitaptan spora kadar her şey burada!
         </Typography>
       </Box>
 
@@ -64,7 +62,7 @@ const CategoriesSection = ({ theme, visible, categories }) => {
                     opacity: 1,
                   },
                 }}
-                onClick={() => console.log(`Kategoriye git: ${category.link}`)}
+                onClick={() => onCategorySelect(category)}
               >
                 <Box className="category-icon" sx={{
                   mb: 3,
@@ -106,7 +104,7 @@ const CategoriesSection = ({ theme, visible, categories }) => {
           color="primary"
           size="large"
           sx={{ borderRadius: 3, px: 4 }}
-          onClick={() => console.log('Tüm Kategoriler')}
+          onClick={() => console.log('Tüm Kategoriler sayfasına git')}
         >
           Tüm Kategorileri Gör
         </Button>
