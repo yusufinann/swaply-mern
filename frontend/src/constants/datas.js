@@ -17,79 +17,78 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 export const categories = [
   {
-    id: 1,
+    id: "1",
     title: 'Elektronik',
     subtitle: 'Telefonlar, Bilgisayarlar',
     icon: <DevicesOtherIcon sx={{ fontSize: 60, color: '#1565c0' }} />,
     bgColor: '#e3f2fd',
     link: '/category/elektronik',
-    value: 'elektronik', // Added for clarity, or derive from link
+    value: 'elektronik',
   },
   {
-    id: 2,
+    id: "2",
     title: 'Moda ve Giyim',
     subtitle: 'Kıyafetler, Ayakkabılar',
     icon: <CheckroomIcon sx={{ fontSize: 60, color: '#c62828' }} />,
     bgColor: '#ffebee',
     link: '/category/moda',
-    value: 'moda', // Added for clarity
+    value: 'moda',
   },
   {
-    id: 3,
+    id: "3",
     title: 'Ev ve Yaşam',
     subtitle: 'Mobilyalar, Dekorasyon',
     icon: <HomeWorkIcon sx={{ fontSize: 60, color: '#2e7d32' }} />,
     bgColor: '#e8f5e9',
     link: '/category/ev-yasam',
-    value: 'ev-yasam', // Added for clarity
+    value: 'ev-yasam',
   },
   {
-    id: 4,
+    id: "4",
     title: 'Hobi ve Oyuncak',
     subtitle: 'Kitaplar, Oyunlar',
     icon: <ToysIcon sx={{ fontSize: 60, color: '#ff8f00' }} />,
     bgColor: '#fff3e0',
     link: '/category/hobi-oyuncak',
-    value: 'hobi-oyuncak', // Added for clarity
+    value: 'hobi-oyuncak',
   },
   {
-    id: 5,
+    id: "5",
     title: 'Kitap ve Dergi',
     subtitle: 'Romanlar, Eğitim',
     icon: <BookIcon sx={{ fontSize: 60, color: '#4527a0' }} />,
     bgColor: '#ede7f6',
     link: '/category/kitap',
-    value: 'kitap', // Added for clarity
+    value: 'kitap',
   },
   {
-    id: 6,
+    id: "6",
     title: 'Spor ve Outdoor',
     subtitle: 'Ekipmanlar, Aksesuarlar',
     icon: <SportsEsportsIcon sx={{ fontSize: 60, color: '#00695c' }} />,
     bgColor: '#e0f2f1',
     link: '/category/spor',
-    value: 'spor', // Added for clarity
+    value: 'spor',
   },
   {
-    id: 7,
+    id: "7",
     title: 'Araç Parçaları',
     subtitle: 'Oto, Motosiklet',
     icon: <DirectionsCarIcon sx={{ fontSize: 60, color: '#6a1b9a' }} />,
     bgColor: '#f3e5f5',
     link: '/category/arac',
-    value: 'arac', // Added for clarity
+    value: 'arac',
   },
   {
-    id: 8,
+    id: "8",
     title: 'Diğer Her Şey',
     subtitle: 'Antikalar, Koleksiyonlar',
     icon: <BuildIcon sx={{ fontSize: 60, color: '#4e342e' }} />,
     bgColor: '#efebe9',
     link: '/category/diger',
-    value: 'diger', // Added for clarity
+    value: 'diger',
   },
 ];
-
 
 export const featuredItems = [
   {

@@ -26,7 +26,7 @@ const ItemListSection = ({
   useEffect(() => {
     const fetchItems = async (pageToFetch = 1) => {
       setLoading(true);
-      if (pageToFetch === 1) setError(null); // Reset error only on initial load/filter change
+      if (pageToFetch === 1) setError(null);
 
       try {
         const params = { page: pageToFetch, limit: itemsPerPage };
@@ -52,13 +52,11 @@ const ItemListSection = ({
     };
 
     fetchItems(1);
-     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categoryFilter, searchQuery, itemsPerPage]);
 
   const handleLoadMore = () => {
     if (currentPage < totalPages && !loading) {
       const nextPage = currentPage + 1;
-      // Re-trigger fetch logic for the next page
       fetchMoreItems(nextPage);
     }
   };
@@ -74,11 +72,11 @@ const ItemListSection = ({
         if (response.success) {
           setInternalItems(prevItems => [...prevItems, ...response.data]);
           setCurrentPage(response.currentPage || page);
-          setTotalPages(response.totalPages || totalPages); // Keep existing if not returned
+          setTotalPages(response.totalPages || totalPages); 
           setShowViewMore((response.currentPage || page) < (response.totalPages || totalPages));
         } else {
           console.error("Daha fazla ürün yüklenemedi:", response.message);
-          // Optionally show a snackbar for load more errors
+          
         }
       } catch (err) {
         console.error("Daha fazla ürün yüklenirken hata:", err.message);
@@ -100,14 +98,25 @@ const ItemListSection = ({
      return (
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
-          {onClearCategory && (
-            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 4 }}>
-              Geri Dön
-            </Button>
-          )}
-           <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
-          </Typography>
+           <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2, 
+              mb: 1.5,
+              flexWrap: 'wrap'
+            }}
+          >
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>
+              {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
+            </Typography>            
+            {onClearCategory && (
+              <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory}>
+                Tüm Kategorilere Dön
+              </Button>
+            )}
+          </Box>
           <Alert severity="error" sx={{mt: 2}}>{error}</Alert>
         </Box>
       </Container>
@@ -118,14 +127,25 @@ const ItemListSection = ({
     return (
       <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
         <Box sx={{ textAlign: 'center', mb: 6 }}>
-          {onClearCategory && (
-            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 4 }}>
-              Geri Dön
-            </Button>
-          )}
-          <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
-            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2, 
+              mb: 1.5,
+              flexWrap: 'wrap'
+            }}
+          >
+            {onClearCategory && (
+              <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory}>
+                Tüm Kategorilere Dön
+              </Button>
+            )}
+            <Typography variant="h4" component="h2" sx={{ fontWeight: 'bold' }}>
+              {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Tüm Ürünler")}
+            </Typography>
+          </Box>
           <Typography variant="h6" color="text.secondary">
             {searchQuery ? `"${searchQuery}" için sonuç bulunamadı.` : "Görünüşe göre burada hiç ürün yok!"}
           </Typography>
@@ -137,15 +157,35 @@ const ItemListSection = ({
   return (
     <Box sx={{ backgroundColor: theme.palette.background.paper, py: { xs: 3, md: 5 } }}>
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: {xs: 4, md: 6} }}>
-          {onClearCategory && (
-            <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory} sx={{ mb: 3 }}>
-              Tüm Kategorilere Dön
-            </Button>
-          )}
-          <Typography variant="h3" component="h2" sx={{ fontWeight: 'bold', mb: 1.5, fontSize: {xs: '2rem', sm: '2.5rem'} }}>
-            {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Keşfet")}
-          </Typography>
+        <Box sx={{ textAlign: 'center', mb: {xs: 2, md: 4} }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2, 
+              mb: 1.5,
+              flexWrap: 'wrap'
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="h2"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: {xs: '2rem', sm: '2.5rem'}
+              }}
+            >
+              {title || (categoryFilter ? `${categoryFilter} Kategorisi` : "Keşfet")}
+            </Typography>
+            
+            {onClearCategory && (
+              <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={onClearCategory}>
+                Tüm Kategorilere Dön
+              </Button>
+            )}
+          </Box>
+
           {subtitle && (
             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
               {subtitle}

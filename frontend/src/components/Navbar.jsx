@@ -54,7 +54,7 @@ const Navbar = () => {
   };
 
   const handleCategorySelectInNavbar = (category) => {
-    navigate(`/category/${category.id}`);
+    navigate(`/category/${category.value}`);
   };
 
   return (

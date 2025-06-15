@@ -9,6 +9,7 @@ import ProtectedRoute from './components/protectedRoute.js';
 import LoadingFallback from './components/LoadingFallback.js';
 import EditProductPage from '../pages/EditProductPage/index.jsx';
 import MySwappableItemsPage from '../pages/MySwappableItemsPage/index.jsx';
+import CategoryPage from '../pages/CategoryPage/index.jsx';
 
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage/index.jsx'));
@@ -30,7 +31,7 @@ const AppRouter = () => {
 
             <Route element={<MainAppLayout />}>
               <Route path="/" element={<MainScreen />} />
-              <Route path="/category/:categoryId" element={<MainScreen />} /> 
+              <Route path="/category/:categoryId" element={<CategoryPage/>} /> 
               <Route
                 element={
                   <ProtectedRoute>
