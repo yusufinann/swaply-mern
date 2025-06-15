@@ -23,6 +23,7 @@ export const categories = [
     icon: <DevicesOtherIcon sx={{ fontSize: 60, color: '#1565c0' }} />,
     bgColor: '#e3f2fd',
     link: '/category/elektronik',
+    value: 'elektronik', // Added for clarity, or derive from link
   },
   {
     id: 2,
@@ -31,6 +32,7 @@ export const categories = [
     icon: <CheckroomIcon sx={{ fontSize: 60, color: '#c62828' }} />,
     bgColor: '#ffebee',
     link: '/category/moda',
+    value: 'moda', // Added for clarity
   },
   {
     id: 3,
@@ -39,6 +41,7 @@ export const categories = [
     icon: <HomeWorkIcon sx={{ fontSize: 60, color: '#2e7d32' }} />,
     bgColor: '#e8f5e9',
     link: '/category/ev-yasam',
+    value: 'ev-yasam', // Added for clarity
   },
   {
     id: 4,
@@ -47,6 +50,7 @@ export const categories = [
     icon: <ToysIcon sx={{ fontSize: 60, color: '#ff8f00' }} />,
     bgColor: '#fff3e0',
     link: '/category/hobi-oyuncak',
+    value: 'hobi-oyuncak', // Added for clarity
   },
   {
     id: 5,
@@ -55,6 +59,7 @@ export const categories = [
     icon: <BookIcon sx={{ fontSize: 60, color: '#4527a0' }} />,
     bgColor: '#ede7f6',
     link: '/category/kitap',
+    value: 'kitap', // Added for clarity
   },
   {
     id: 6,
@@ -63,6 +68,7 @@ export const categories = [
     icon: <SportsEsportsIcon sx={{ fontSize: 60, color: '#00695c' }} />,
     bgColor: '#e0f2f1',
     link: '/category/spor',
+    value: 'spor', // Added for clarity
   },
   {
     id: 7,
@@ -71,6 +77,7 @@ export const categories = [
     icon: <DirectionsCarIcon sx={{ fontSize: 60, color: '#6a1b9a' }} />,
     bgColor: '#f3e5f5',
     link: '/category/arac',
+    value: 'arac', // Added for clarity
   },
   {
     id: 8,
@@ -79,8 +86,10 @@ export const categories = [
     icon: <BuildIcon sx={{ fontSize: 60, color: '#4e342e' }} />,
     bgColor: '#efebe9',
     link: '/category/diger',
+    value: 'diger', // Added for clarity
   },
 ];
+
 
 export const featuredItems = [
   {

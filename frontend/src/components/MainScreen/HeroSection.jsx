@@ -27,7 +27,7 @@ const HeroSection = ({ theme, visible }) => {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [visible, slides.length]);
+  }, [visible]);
 
   return (
     <Box
@@ -43,8 +43,6 @@ const HeroSection = ({ theme, visible }) => {
         display: 'flex',
         alignItems: 'center',
         mt:2,
-        mr: { xs: 2, sm: 4, md: 10 },
-        ml: { xs: 2, sm: 4, md: 10 },
         borderTopRightRadius:'50px',
          borderTopLeftRadius:'50px'
       }}

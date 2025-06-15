@@ -17,9 +17,8 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { createItem as createItemApi } from '../../services/itemService'; // Correctly import your API service
-
-const ITEM_CATEGORIES = ['Books', 'Electronics', 'Clothing', 'Furniture', 'Home Goods', 'Toys & Games', 'Sports & Outdoors', 'Collectibles & Art', 'Other'];
+import { createItem as createItemApi } from '../../services/itemService';
+import { categories as APP_CATEGORIES } from '../../constants/datas'; // Adjusted import
 
 const LoadProductPage = () => {
   const navigate = useNavigate();
@@ -79,7 +78,7 @@ const LoadProductPage = () => {
     const itemData = {
       title: title.trim(),
       description: description.trim(),
-      category,
+      category, // This will now be the slug, e.g., 'moda'
       location: location.trim(),
       images: filteredImages,
       tags,
@@ -87,12 +86,10 @@ const LoadProductPage = () => {
 
     setLoading(true);
     try {
-      // Use the imported createItemApi service function
       const response = await createItemApi(itemData);
       
-      if (response.success) { // Assuming your API returns { success: true, data: ... }
+      if (response.success) {
         setSuccess('Ürününüz başarıyla yüklendi! Takaslarım sayfasına yönlendiriliyorsunuz...');
-        // Clear form
         setTitle('');
         setDescription('');
         setCategory('');
@@ -104,12 +101,9 @@ const LoadProductPage = () => {
           navigate('/takasta');
         }, 2000);
       } else {
-        // If API returns { success: false, message: '...' } even on 2xx for logical errors
         setError(response.message || 'Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
       }
     } catch (err) {
-      // Error is now whatever was thrown by itemService (either response.data or generic error)
-      // The apiClient interceptor already console.error's it.
       setError(err.message || 'Sunucuyla iletişim kurulamadı veya beklenmeyen bir hata oluştu.');
     } finally {
       setLoading(false);
@@ -127,7 +121,6 @@ const LoadProductPage = () => {
         {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
 
         <Grid container spacing={3}>
-          {/* Title */}
           <Grid item xs={12}>
             <TextField
               required
@@ -142,7 +135,6 @@ const LoadProductPage = () => {
             />
           </Grid>
 
-          {/* Description (Wants) */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -158,7 +150,6 @@ const LoadProductPage = () => {
             />
           </Grid>
 
-          {/* Category */}
           <Grid item xs={12} sm={6}>
             <TextField
               required
@@ -174,15 +165,14 @@ const LoadProductPage = () => {
               <MenuItem value="">
                 <em>Kategori Seçin</em>
               </MenuItem>
-              {ITEM_CATEGORIES.map((cat) => (
-                <MenuItem key={cat} value={cat}>
-                  {cat}
+              {APP_CATEGORIES.map((cat) => (
+                <MenuItem key={cat.id} value={cat.value || cat.link.split('/').pop()}>
+                  {cat.title}
                 </MenuItem>
               ))}
             </TextField>
           </Grid>
 
-          {/* Location */}
           <Grid item xs={12} sm={6}>
             <TextField
               fullWidth
@@ -196,7 +186,6 @@ const LoadProductPage = () => {
             />
           </Grid>
 
-          {/* Images */}
           <Grid item xs={12}>
             <Typography variant="subtitle1" gutterBottom sx={{mt:1}}>Ürün Resimleri (URL)</Typography>
             {images.map((imgUrl, index) => (
@@ -235,7 +224,6 @@ const LoadProductPage = () => {
             </Typography>
           </Grid>
 
-          {/* Tags */}
           <Grid item xs={12}>
             <Typography variant="subtitle1" gutterBottom sx={{mt:1}}>Etiketler</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1}}>
@@ -279,7 +267,6 @@ const LoadProductPage = () => {
             </Typography>
           </Grid>
 
-          {/* Submit Button */}
           <Grid item xs={12} sx={{ textAlign: 'center', mt: 2 }}>
             <Button
               type="submit"

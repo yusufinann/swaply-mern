@@ -19,7 +19,8 @@ const MainAppLayout = () => {
           paddingTop: `${TOTAL_NAVBAR_HEIGHT_FOR_PADDING}px`,
           display: 'flex',
           flexDirection: 'column',
-          minHeight: `calc(100vh - ${TOTAL_NAVBAR_HEIGHT_FOR_PADDING}px)`,
+          minHeight: `calc(100vh - ${TOTAL_NAVBAR_HEIGHT_FOR_PADDING}px)`, ml: { xs: 2, sm: 4, md: 10 },
+    mr: { xs: 2, sm: 4, md: 10 },
         }}
       >
         <Box sx={{ flexGrow: 1 }}>

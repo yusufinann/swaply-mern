@@ -73,19 +73,10 @@ const MainScreen = (props) => {
     window.scrollTo(0, 0);
   }, [categoryId, navigate]);
 
-  const handleCategorySelectFromPage = (category) => {
-    navigate(`/category/${category.id}`);
-  };
-
   const clearCategorySelectionAndNavigateHome = () => {
     navigate('/');
   };
 
-  // Define common horizontal margins to match HeroSection's internal margins
-  const commonSectionHorizontalMargins = {
-    ml: { xs: 2, sm: 4, md: 10 },
-    mr: { xs: 2, sm: 4, md: 10 },
-  };
 
   const sectionVerticalSpacing = { xs: 4, sm: 5, md: 1 }; // Adjust as needed (theme.spacing units)
 
@@ -105,9 +96,6 @@ const MainScreen = (props) => {
 
           <Box
             id="featured-items-section"
-            sx={{
-              ...commonSectionHorizontalMargins,
-            }}
           >
             <ItemListSection
               theme={theme}
@@ -124,7 +112,6 @@ const MainScreen = (props) => {
           <Box
             id="how-it-works-section"
             sx={{
-              ...commonSectionHorizontalMargins,
               mt: sectionVerticalSpacing, 
              }}
           >
@@ -140,9 +127,7 @@ const MainScreen = (props) => {
         <Box
           id="category-items-section"
           sx={{
-            ...commonSectionHorizontalMargins,
-            mt: 10, // To match HeroSection's initial top margin
-            // mb: sectionVerticalSpacing, // Optional: space before footer, handled by page pb
+            mt: 10, 
           }}
         >
           <ItemListSection

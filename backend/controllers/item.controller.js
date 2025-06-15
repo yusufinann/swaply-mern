@@ -22,6 +22,11 @@ export const createItem = async (req, res) => {
     });
 
     const savedItem = await newItem.save();
+    await savedItem.populate({
+        path: 'owner',
+        select: 'firstName lastName avatarUrl'
+    });
+
     res.status(201).json({ success: true, data: savedItem });
 
   } catch (error) {
@@ -36,7 +41,12 @@ export const createItem = async (req, res) => {
 
 export const getMyItems = async (req, res) => {
   try {
-    const items = await Item.find({ owner: req.user._id }).sort({ createdAt: -1 });
+    const items = await Item.find({ owner: req.user._id })
+      .populate({
+        path: 'owner',
+        select: 'firstName lastName avatarUrl'
+      })
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: items.length, data: items });
   } catch (error) {
     console.error('Get My Items Error:', error);
@@ -50,7 +60,11 @@ export const getItemById = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Geçersiz ürün ID formatı.' });
     }
 
-    const item = await Item.findById(req.params.id);
+    const item = await Item.findById(req.params.id)
+      .populate({
+        path: 'owner',
+        select: 'firstName lastName avatarUrl'
+      });
 
     if (!item) {
       return res.status(404).json({ success: false, message: 'Ürün bulunamadı.' });
@@ -91,6 +105,11 @@ export const updateItem = async (req, res) => {
     if (status) item.status = status; 
 
     const updatedItem = await item.save();
+    await updatedItem.populate({
+        path: 'owner',
+        select: 'firstName lastName avatarUrl'
+    });
+    
     res.status(200).json({ success: true, data: updatedItem });
 
   } catch (error) {
@@ -141,11 +160,14 @@ export const getAllAvailableItems = async (req, res) => {
     }
 
     if (search) {
-      query.title = { $regex: search, $options: 'i' }; // Case-insensitive search on title
+      query.title = { $regex: search, $options: 'i' };
     }
 
     const items = await Item.find(query)
-      .populate('owner', 'firstName lastName avatarUrl rating') // Populate owner info
+      .populate({
+        path: 'owner',
+        select: 'firstName lastName avatarUrl'
+      })
       .sort({ createdAt: -1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)

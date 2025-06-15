@@ -19,34 +19,33 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getItemById as getItemByIdApi, updateItem as updateItemApi } from '../../services/itemService';
-
-const ITEM_CATEGORIES = ['Books', 'Electronics', 'Clothing', 'Furniture', 'Home Goods', 'Toys & Games', 'Sports & Outdoors', 'Collectibles & Art', 'Other'];
+import { categories as APP_CATEGORIES } from '../../constants/datas'; // Adjusted import
 
 const EditProductPage = () => {
   const navigate = useNavigate();
-  const { id: itemId } = useParams(); // Get item ID from URL
+  const { id: itemId } = useParams();
 
-  const [initialLoading, setInitialLoading] = useState(true); // For fetching initial item data
+  const [initialLoading, setInitialLoading] = useState(true);
   const [formValues, setFormValues] = useState({
     title: '',
-    description: '', // What the user wants in return
+    description: '',
     category: '',
     location: '',
     images: [''],
     tags: [],
-    status: 'Available', // Include status if editable
+    status: 'Available',
   });
   const [currentTag, setCurrentTag] = useState('');
 
-  const [loading, setLoading] = useState(false); // For form submission
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
   const populateForm = useCallback((item) => {
     setFormValues({
       title: item.title || '',
-      description: item.description || '', // This is for "desiredItems"
-      category: item.category || '',
+      description: item.description || '',
+      category: item.category || '', // This will be the slug from backend, e.g., 'moda'
       location: item.location || '',
       images: item.images && item.images.length > 0 ? item.images : [''],
       tags: item.tags || [],
@@ -128,7 +127,7 @@ const EditProductPage = () => {
     const itemDataToUpdate = {
       title: formValues.title.trim(),
       description: formValues.description.trim(),
-      category: formValues.category,
+      category: formValues.category, // This will be the slug, e.g., 'moda'
       location: formValues.location.trim(),
       images: filteredImages,
       tags: formValues.tags,
@@ -211,13 +210,15 @@ const EditProductPage = () => {
               name="category"
               select
               label="Kategori"
-              value={formValues.category}
+              value={formValues.category} // This will be e.g. 'moda'
               onChange={handleInputChange}
               disabled={loading}
             >
               <MenuItem value=""><em>Kategori Seçin</em></MenuItem>
-              {ITEM_CATEGORIES.map((cat) => (
-                <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+              {APP_CATEGORIES.map((cat) => (
+                <MenuItem key={cat.id} value={cat.value || cat.link.split('/').pop()}> {/* Value is e.g. 'moda' */}
+                  {cat.title} {/* Displayed text is e.g. 'Moda ve Giyim' */}
+                </MenuItem>
               ))}
             </TextField>
           </Grid>

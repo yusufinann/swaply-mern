@@ -40,10 +40,10 @@ const AppRouter = () => {
               >
                 <Route element={<MainContainer />}> 
                   <Route path="urun-yukle" element={<LoadProductPage />} />
-                  <Route path="takas-teklifi" element={<SwapOfferPage />} />
                   <Route path="teklifleri-yonet" element={<ManageOffersPage />} />
                   <Route path="takasta" element={<MySwappableItemsPage/>} />
                   <Route path="urun-duzenle/:id" element={<EditProductPage/>} />
+                  <Route path="takas-teklifi" element={<SwapOfferPage/>} />
                 </Route>
               </Route>
             </Route>
