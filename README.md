@@ -1,4 +1,4 @@
-# Swaply - MERN Yığınlı İkinci El Takas Platformu 🔁
+# Swaply - MERN İkinci El Takas Platformu 🔁
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/yusufinann/swaply-mern?style=social)](https://github.com/yusufinann/swaply-mern/stargazers)
 
