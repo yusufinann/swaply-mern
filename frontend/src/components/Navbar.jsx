@@ -61,7 +61,7 @@ const Navbar = () => {
   const handleProfile = () => {
     handleCloseUserMenu();
     if (user && user._id) {
-      navigate(`/profil/${user._id}`);
+      navigate(`/profil`);
     } else {
       navigate('/login'); // Redirect to login if no user ID
     }

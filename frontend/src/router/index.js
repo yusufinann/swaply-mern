@@ -11,6 +11,7 @@ import EditProductPage from '../pages/EditProductPage/index.jsx';
 import MySwappableItemsPage from '../pages/MySwappableItemsPage/index.jsx';
 import CategoryPage from '../pages/CategoryPage/index.jsx';
 import MyFavoritesPage from '../pages/MyFavoritesPage/index.jsx';
+import ProfilePage from '../pages/ProfilePage/index.jsx';
 
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage/index.jsx'));
@@ -47,6 +48,8 @@ const AppRouter = () => {
                   <Route path="urun-duzenle/:id" element={<EditProductPage/>} />
                   <Route path="takas-teklifi" element={<SwapOfferPage/>} />
                    <Route path="favorilerim" element={<MyFavoritesPage/>} />
+                  <Route path="profil" element={<ProfilePage/>} />
+                  <Route path="/profil/:userId" element={<ProfilePage />} />
                 </Route>
               </Route>
             </Route>

@@ -1,7 +1,7 @@
 import { User } from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import config from '../config/config.js';
-
+import mongoose from 'mongoose'
 const generateToken = (id) => {
   return jwt.sign({ id }, config.jwt.secret, {
     expiresIn: config.jwt.expiresIn,
@@ -117,4 +117,33 @@ export const logout = async (req, res) => {
         success: true,
         message: 'Başarıyla çıkış yapıldı.'
     });
+};
+
+export const getUserProfileById = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ success: false, message: 'Geçersiz kullanıcı ID formatı.' });
+        }
+
+        // Şifre hariç diğer bilgileri seçiyoruz
+        const user = await User.findById(userId).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+        }
+
+        res.status(200).json({
+            success: true,
+            user: user
+        });
+
+    } catch (error) {
+        console.error('Get User Profile By ID Error:', error);
+        if (error.name === 'CastError') { // Mongoose ID cast hatası için
+             return res.status(400).json({ success: false, message: 'Geçersiz kullanıcı ID formatı.' });
+        }
+        res.status(500).json({ success: false, message: 'Sunucu hatası. Kullanıcı profili alınamadı.' });
+    }
 };
