@@ -22,6 +22,10 @@ const userSchema = new Schema({
   },
   avatarUrl: { type: String, default: '' },
   rating: { type: Number, default: 0, min: 0, max: 5 },
+    favorites: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Item' // Item modelinizin adı neyse o olmalı
+    }],
   swapCount: { type: Number, default: 0 },
   bio: { type: String, default: '' },
   location: { type: String, default: '' }

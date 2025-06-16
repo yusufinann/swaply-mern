@@ -1,8 +1,7 @@
 // src/pages/CategoryPage/index.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, Box, CircularProgress, Alert, Button } from '@mui/material';
-// MainAppLayout'u buradan import etmeye gerek yok, çünkü AppRouter zaten sağlıyor.
+import { Container, Typography,CircularProgress, Alert, Button } from '@mui/material';
 import { categories } from '../../constants/datas';
 import ItemListSection from '../MainScreen/components/ItemListSection';
 

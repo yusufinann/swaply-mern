@@ -10,6 +10,7 @@ import connectToMongoDb from './db/connectToMongoDb.js';
 import authRoutes from './routes/auth.routes.js'; 
 import config from './config/config.js'; 
 import itemRoutes from './routes/item.routes.js'; 
+import favoritesRoutes from './routes/favorite.Routes.js'
 const app = express();
 
 
@@ -30,6 +31,7 @@ app.get('/', (req, res) => res.send('Merhaba, Takasta backend API çalışıyor!
 // API Rotaları
 app.use('/api/auth', authRoutes); 
 app.use('/api/items', itemRoutes);
+app.use('/api/favorites', favoritesRoutes);
 app.use((err, req, res, next) => {
   console.error("Beklenmeyen Hata:", err.stack);
   const statusCode = err.statusCode || 500;

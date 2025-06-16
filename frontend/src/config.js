@@ -8,7 +8,9 @@ const config = {
     items: "/items", 
     myItems: "/items/my-items", // Added for clarity
     itemById: (id) => `/items/${id}`, // Function to generate item-specific path
-     availableItems: "/items/all/available" 
+     availableItems: "/items/all/available" ,
+     favoriteItem: (itemId) => `/favorites/${itemId}`,
+     getUserFavorites: "/favorites/me/"
   }
 };
 

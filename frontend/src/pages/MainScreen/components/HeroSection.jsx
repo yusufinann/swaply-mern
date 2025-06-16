@@ -10,11 +10,12 @@ import {
 } from '@mui/material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { slides } from '../../../constants/datas'; // Assuming this path is correct
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection = ({ theme, visible }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [fadeIn, setFadeIn] = useState(true);
-
+  const navigate=useNavigate();
   useEffect(() => {
     if (!visible || slides.length <= 1) return;
 
@@ -28,6 +29,9 @@ const HeroSection = ({ theme, visible }) => {
 
     return () => clearInterval(interval);
   }, [visible]);
+  const handleAddNewItem = () => {
+    navigate('/urun-yukle');
+  };
 
   return (
     <Box
@@ -242,7 +246,7 @@ const HeroSection = ({ theme, visible }) => {
                   transform: 'translateY(-1px)',
                 },
               }}
-              onClick={() => console.log('Ürün Yükle')}
+              onClick={handleAddNewItem}
             >
               Ürününü Yükle
             </Button>

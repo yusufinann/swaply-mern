@@ -17,15 +17,16 @@ import {
   Stack,
   Divider,
   Link,
-  Grid
+  Grid,
+  Snackbar, // Snackbar için eklendi
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CloseIcon from '@mui/icons-material/Close';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import CategoryIcon from '@mui/icons-material/Style';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite'; // Dolu kalp ikonu eklendi
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -34,6 +35,8 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getItemById as getItemByIdApi } from '../../services/itemService';
+// Favori servis fonksiyonlarını import et
+import { addFavoriteItem, removeFavoriteItem } from '../../services/userService'; // Veya userService/favoriteService
 import { useAuth } from '../../shared/context/AuthContext';
 
 
@@ -61,12 +64,22 @@ const SwapOfferPage = () => {
 
   const theme = useTheme();
   const navigate = useNavigate();
-  const { user: authUser } = useAuth();
+  // AuthContext'ten updateUserFavorites fonksiyonunu da almamız gerekebilir.
+  // Bu fonksiyon, backend'den dönen güncel favori listesiyle context'teki kullanıcı bilgisini günceller.
+  // Eğer AuthContext'te böyle bir fonksiyon yoksa, eklemeniz iyi olur.
+  // Şimdilik sadece user objesini alıyorum, ancak context güncellemesi idealdir.
+  const { user: authUser, updateUser: updateAuthUserContext } = useAuth(); // updateUser örnektir, sizinki farklı olabilir
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  // Favori state'leri
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
 
   useEffect(() => {
     if (itemId) {
@@ -78,6 +91,10 @@ const SwapOfferPage = () => {
           const response = await getItemByIdApi(itemId);
           if (response.success && response.data) {
             setItem(response.data);
+            // Kullanıcı giriş yapmışsa ve kullanıcının favorileri varsa, bu ürün favorilerde mi kontrol et
+            if (authUser && authUser.favorites && response.data._id) {
+              setIsFavorited(authUser.favorites.includes(response.data._id));
+            }
           } else {
             setError(response.message || 'Ürün detayı alınamadı.');
           }
@@ -91,7 +108,66 @@ const SwapOfferPage = () => {
     } else {
       setItem(null);
     }
-  }, [itemId]);
+  }, [itemId, authUser]); // authUser'ı dependency array'e ekle, login/logout sonrası kontrol için
+
+  // Bu useEffect, item yüklendikten sonra veya authUser değiştiğinde favori durumunu ayarlar.
+  useEffect(() => {
+    if (authUser && authUser.favorites && item && item._id) {
+        setIsFavorited(authUser.favorites.includes(item._id));
+    } else {
+        setIsFavorited(false); // Kullanıcı yoksa, favorileri yoksa veya item yoksa favori değil
+    }
+  }, [authUser, item]);
+
+
+  const handleToggleFavorite = async () => {
+    if (!authUser) {
+      setSnackbar({ open: true, message: 'Favorilere eklemek için giriş yapmalısınız.', severity: 'info' });
+      // navigate('/login'); // İsteğe bağlı olarak login sayfasına yönlendir
+      return;
+    }
+    if (!item || !item._id) return;
+
+    setFavoriteLoading(true);
+    try {
+      let response;
+      if (isFavorited) {
+        response = await removeFavoriteItem(item._id);
+        setSnackbar({ open: true, message: response.message || 'Ürün favorilerden çıkarıldı!', severity: 'success' });
+      } else {
+        response = await addFavoriteItem(item._id);
+        setSnackbar({ open: true, message: response.message || 'Ürün favorilere eklendi!', severity: 'success' });
+      }
+
+      if (response.success) {
+        setIsFavorited(!isFavorited);
+        // AuthContext'teki kullanıcı bilgisini güncelle (çok önemli!)
+        // Backend genelde güncel favori listesini döner.
+        if (response.favorites && updateAuthUserContext) { // updateAuthUserContext AuthContext'ten gelmeli
+            // Örnek: updateAuthUserContext(prevUser => ({...prevUser, favorites: response.favorites}));
+            // Veya daha direkt:
+            // const updatedUser = { ...authUser, favorites: response.favorites };
+            // login(updatedUser); // Eğer login fonksiyonunuz setUser'ı da yapıyorsa.
+            // En iyisi AuthContext'e özel bir updateUserFavorites fonksiyonu eklemek.
+            // Şimdilik, eğer AuthContext'te user.favorites direkt güncellenmiyorsa,
+            // sayfa yenilenene kadar UI güncel kalmayabilir.
+            // Bu kısım AuthContext'inizin yapısına göre uyarlanmalı.
+             if (updateAuthUserContext && authUser) { // updateAuthUserContext -> AuthContext'ten gelen bir fonksiyon olmalı
+                const updatedUserInfo = { ...authUser, favorites: response.favorites };
+                updateAuthUserContext(updatedUserInfo); // Bu fonksiyon AuthContext'te user state'ini güncellemeli
+            }
+        }
+      } else {
+        setSnackbar({ open: true, message: response.message || 'İşlem başarısız.', severity: 'error' });
+      }
+    } catch (err) {
+      console.error("Favori işlem hatası:", err);
+      setSnackbar({ open: true, message: err.message || "Favori işlemi sırasında bir hata oluştu.", severity: 'error' });
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
 
   const handleImageClick = (imgUrl) => {
     setSelectedImage(imgUrl);
@@ -101,7 +177,14 @@ const SwapOfferPage = () => {
     setSelectedImage(null);
   };
 
-  if (!itemId && !loading) {
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  if (!itemId && !loading && !item) { // !item eklendi
     return (
       <Box sx={{ maxWidth: 'md', mx: 'auto', py: 4, textAlign: 'center' }}>
         <Typography variant="h4" component="h1" gutterBottom>
@@ -148,22 +231,26 @@ const SwapOfferPage = () => {
   const isOwner = authUser && item.owner?._id === authUser._id;
 
   const handleMakeOffer = () => {
+    if (!authUser) {
+      setSnackbar({ open: true, message: 'Teklif yapmak için giriş yapmalısınız.', severity: 'info' });
+      return;
+    }
     if (isOwner) {
-      alert("Kendi ürününüze teklif yapamazsınız.");
+      setSnackbar({ open: true, message: 'Kendi ürününüze teklif yapamazsınız.', severity: 'warning' });
       return;
     }
     console.log("Make offer for item:", item._id);
-    alert(`"${item.title}" için takas teklifi oluşturma süreci başlayacak.`);
+    setSnackbar({ open: true, message: `"${item.title}" için takas teklifi oluşturma süreci başlayacak.`, severity: 'info' });
   };
 
   const mainImage = item.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/600x400.png?text=Resim+Yok';
   const otherImages = item.images && item.images.length > 1 ? item.images.slice(1) : [];
 
   const productRatingValue = item.rating || 4.0;
-  const reviewCount = item.reviewCount || 71743;
-  const qaCount = item.qaCount || 4438;
-  const popularityText = item.popularityText || "Popüler ürün! Son 24 saatte 10,8B kişi görüntüledi!";
-  const itemPrice = item.price || "136 TL";
+  const reviewCount = item.reviewCount || 0; // Varsayılan 0
+  const qaCount = item.qaCount || 0; // Varsayılan 0
+  const popularityText = item.popularityText || "Popüler ürün!";
+
 
   return (
     <Box
@@ -181,6 +268,7 @@ const SwapOfferPage = () => {
             width: '100%',
           }}
         >
+          {/* IMAGE BOX */}
           <Box
             sx={{
               width: { xs: '100%', md: '40%' },
@@ -241,6 +329,7 @@ const SwapOfferPage = () => {
             )}
           </Box>
 
+          {/* DETAILS BOX */}
           <Box
             sx={{
               width: { xs: '100%', md: '60%' },
@@ -248,8 +337,8 @@ const SwapOfferPage = () => {
               flexDirection: 'column',
             }}
           >
-            <Link href="#" underline="hover" sx={{ typography: 'caption', color: 'warning.dark', mb: 0.5 }}>
-              {item.category ? `${item.category} kategorisinde` : 'Kategori Bilgisi'}
+            <Link href="#" underline="hover" sx={{ typography: 'caption', color: 'text.secondary', mb: 0.5 }}> {/* warning.dark'tan text.secondary'ye */}
+              {item.category?.name || item.category || 'Kategori Bilgisi'} {/* item.category bir obje ise .name alınabilir */}
             </Link>
 
             <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', lineHeight: 1.3, mb: 1 }}>
@@ -272,39 +361,77 @@ const SwapOfferPage = () => {
               <InfoOutlinedIcon fontSize="inherit" sx={{ mr: 0.5, color: 'primary.main' }} /> {popularityText}
             </Typography>
 
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.dark', mb: 2 }}>
-              {itemPrice}
+            {/* Fiyat veya Takas Değeri Alanı - Eğer varsa */}
+            {/* <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'warning.dark', mb: 2 }}>
+                {item.price ? `${item.price.toLocaleString('tr-TR')} TL` : 'Takas Değeri Belirtilmemiş'}
+            </Typography> */}
+             <Typography variant="body1" sx={{ mb: 2, fontStyle: 'italic', color: theme.palette.grey[700] }}>
+                {item.description || 'Durumu belirtilmemiş.'} {/* Ürün durumu için */}
             </Typography>
 
+
             <Stack direction={{xs: 'column', sm: 'row'}} spacing={1.5} sx={{ mb: 3 }}>
-              <Button
-                variant="outlined"
-                onClick={() => alert('Bu ürün için "Şimdi Al" benzeri bir işlem (belki favorilere ekle?)')}
-                sx={{ flexGrow: 1, borderColor: 'warning.main', color: 'warning.main', '&:hover': { borderColor: 'warning.dark', backgroundColor: 'rgba(255, 152, 0, 0.08)'} }}
-              >
-                Favorilere Ekle
-              </Button>
+              {/* FAVORİ BUTONU */}
+              {!isOwner && ( // Sadece ürün sahibi değilse favori butonu gösterilir
+                <Button
+                  variant={isFavorited ? "contained" : "outlined"}
+                  onClick={handleToggleFavorite}
+                  disabled={favoriteLoading || !authUser} // Kullanıcı yoksa da disable
+                  startIcon={
+                    favoriteLoading ? <CircularProgress size={20} color="inherit" /> :
+                    isFavorited ? <FavoriteIcon /> : <FavoriteBorderIcon />
+                  }
+                  sx={{
+                    flexGrow: 1,
+                    borderColor: authUser ? (isFavorited ? 'error.main' : 'grey.500') : 'grey.400',
+                    color: authUser ? (isFavorited ? 'common.white' : 'error.main') : 'text.disabled',
+                    backgroundColor: authUser && isFavorited ? 'error.main' : 'transparent',
+                    '&:hover': {
+                      borderColor: authUser ? 'error.dark' : 'grey.500',
+                      backgroundColor: authUser ? (isFavorited ? 'error.dark' : 'rgba(220, 53, 69, 0.08)') : 'transparent',
+                    },
+                    cursor: !authUser ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  {favoriteLoading
+                    ? (isFavorited ? 'Çıkarılıyor...' : 'Ekleniyor...')
+                    : (isFavorited ? 'Favorilerden Çıkar' : (authUser ? 'Favorilere Ekle' : 'Giriş Yapın'))
+                  }
+                </Button>
+              )}
+
+              {/* TEKLİF YAP BUTONU */}
               {!isOwner && (
                   <Button
                   variant="contained"
                   color="warning"
-                  size="large"
+                  // size="large" // Butonların boyutu uyumlu olsun diye medium (default)
                   fullWidth={false}
                   startIcon={<SwapHorizIcon />}
                   onClick={handleMakeOffer}
-                  sx={{ flexGrow: 1.5, fontWeight: 'bold', py: 1.2, textTransform: 'none', fontSize: '1rem', backgroundColor: 'warning.main', '&:hover': {backgroundColor: 'warning.dark'} }}
+                  disabled={!authUser} // Kullanıcı yoksa disable
+                  sx={{
+                    flexGrow: 1.5,
+                    fontWeight: 'bold',
+                    // py: 1.2, // Yükseklik diğer butonla aynı olsun diye kaldırıldı
+                    textTransform: 'none',
+                    fontSize: '0.9rem', // Diğer butonla benzer font boyutu
+                    backgroundColor: 'warning.main',
+                    '&:hover': {backgroundColor: 'warning.dark'},
+                    cursor: !authUser ? 'not-allowed' : 'pointer'
+                  }}
                   >
                   Bu Ürüne Teklif Yap
                   </Button>
               )}
-              <IconButton aria-label="add to wishlist" sx={{borderColor: theme.palette.grey[400], borderWidth: 1, borderStyle: 'solid', borderRadius: theme.shape.borderRadius}}>
-                  <FavoriteBorderIcon />
-              </IconButton>
+              {/* Eski IconButton kaldırıldı, yerine yukarıdaki butonlar geldi. */}
             </Stack>
+
             {isOwner && (
                  <Alert severity="info" variant="outlined" sx={{mb: 2}}>Bu sizin kendi ürününüz.</Alert>
             )}
 
+            {/* ... (Kargo, Ödeme, Özellikler, Açıklama, Etiketler, Tarih, Konum, Sahip bilgileri...) ... */}
             <Box sx={{ backgroundColor: theme.palette.grey[50], p: 2, borderRadius: 1, mb: 2 }}>
               <Stack spacing={1.5}>
                   <Stack direction="row" spacing={1} alignItems="center">
@@ -316,13 +443,13 @@ const SwapOfferPage = () => {
                   <Stack direction="row" spacing={1} alignItems="flex-start">
                       <LocationOnIcon fontSize="small" color="action" sx={{mt:0.2}}/>
                       <Typography variant="body2" color="text.secondary">
-                      Tahmini Teslim: <Link href="#" underline="hover" onClick={(e) => { e.preventDefault(); alert('Konum seçme özelliği'); }}>Konum Seçin</Link> adresinize göre değişiklik gösterebilir.
+                      Tahmini Teslim: <Link href="#" underline="hover" onClick={(e) => { e.preventDefault(); setSnackbar({open: true, message:'Konum seçme özelliği yakında!', severity: 'info'}); }}>Konum Seçin</Link> adresinize göre değişiklik gösterebilir.
                       </Typography>
                   </Stack>
-                  <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: 'success.light', color: 'success.darker', p: 1, borderRadius: 1, typography: 'caption' }}>
+                  {item.fastDeliveryAvailable && <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: 'success.light', color: 'success.darker', p: 1, borderRadius: 1, typography: 'caption' }}>
                       <CheckCircleIcon fontSize="inherit" sx={{ mr: 0.5 }} />
                       Daha Hızlı Teslimat yapan satıcı var!
-                  </Box>
+                  </Box>}
               </Stack>
             </Box>
 
@@ -337,11 +464,11 @@ const SwapOfferPage = () => {
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" fontWeight="medium" gutterBottom>Öne Çıkan Özellikler:</Typography>
               <Grid container spacing={1}>
-                  {['Form: Sıvı', `Hacim: ${item.volume || '750 ml'}`, 'Ek Özellik: Promosyonlu', `Menşei: ${item.origin || 'TR'}`].map(feature => (
-                      <Grid item xs={6} sm={3} key={feature}>
+                  {[{label: 'Form', value: 'Sıvı'}, {label: 'Hacim', value: item.volume || '750 ml'}, {label:'Ek Özellik', value: 'Promosyonlu'}, {label: 'Menşei', value: item.originCountry || item.origin || 'TR'}].map(feature => ( // item.originCountry eklendi
+                      <Grid item xs={6} sm={3} key={feature.label}>
                           <Paper variant="outlined" sx={{p: 1, textAlign: 'center', height: '100%'}}>
-                              <Typography variant="caption" display="block" color="text.secondary">{feature.split(':')[0]}</Typography>
-                              <Typography variant="body2" fontWeight="medium">{feature.split(':')[1].trim()}</Typography>
+                              <Typography variant="caption" display="block" color="text.secondary">{feature.label}</Typography>
+                              <Typography variant="body2" fontWeight="medium">{feature.value}</Typography>
                           </Paper>
                       </Grid>
                   ))}
@@ -353,7 +480,7 @@ const SwapOfferPage = () => {
             <Typography variant="h6" sx={{ fontWeight: 'medium', mb: 1 }}>
               Takas İsteği / Açıklama:
             </Typography>
-            <Typography variant="body1" color="text.secondary" paragraph sx={{ whiteSpace: 'pre-wrap', maxHeight: '150px', overflowY: 'auto', }}>
+            <Typography variant="body1" color="text.secondary" paragraph sx={{ whiteSpace: 'pre-wrap', maxHeight: '150px', overflowY: 'auto', border: `1px solid ${theme.palette.grey[300]}`, p:1, borderRadius:1 }}>
               {item.description || 'Açıklama belirtilmemiş.'}
             </Typography>
 
@@ -377,7 +504,7 @@ const SwapOfferPage = () => {
             <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                 <LocationOnIcon fontSize="small" color="action" />
                 <Typography variant="body2" color="text.secondary">
-                Konum: {item.location}
+                Konum: {typeof item.location === 'object' ? item.location.city : item.location} {/* item.location obje ise city alınabilir */}
                 </Typography>
             </Stack>
             )}
@@ -400,10 +527,12 @@ const SwapOfferPage = () => {
                 {item.owner && <Rating value={item.owner.rating || 0} precision={0.5} readOnly size="small" />}
               </Box>
             </Box>
+
           </Box>
         </Box>
       </Paper>
 
+      {/* IMAGE DIALOG */}
       <Dialog open={Boolean(selectedImage)} onClose={handleCloseImageDialog} maxWidth="lg" fullWidth>
         <DialogContent sx={{ p: 0, position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.8)' }}>
           <IconButton
@@ -419,6 +548,7 @@ const SwapOfferPage = () => {
         </DialogContent>
       </Dialog>
 
+      {/* TEKLİF OLUŞTURMA BÖLÜMÜ */}
       <Box sx={{ mt: 4, p:3, border: '1px dashed grey', borderRadius: 2, textAlign: 'center' }}>
         <Typography variant="h6">Teklifinizi Oluşturun</Typography>
         <Typography color="text.secondary" sx={{mb: 2}}>
@@ -426,6 +556,18 @@ const SwapOfferPage = () => {
         </Typography>
         <Button variant="contained" disabled>Teklifi Gönder (Yakında)</Button>
       </Box>
+
+      {/* SNACKBAR */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

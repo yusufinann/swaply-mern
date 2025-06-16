@@ -1,12 +1,31 @@
-// src/components/layout/Navbar.js
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, useTheme, IconButton, Avatar, Menu, MenuItem, ListItemIcon, Divider } from '@mui/material';
-import { Logout, AccountCircle, Settings } from '@mui/icons-material';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  useTheme,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  Divider,
+  Badge, // Badge için eklendi
+} from '@mui/material';
+import {
+  Logout,
+  AccountCircle,
+  Settings,
+  ShoppingCartOutlined, // Sepet ikonu
+  FavoriteBorderOutlined, // Favori ikonu
+} from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
-import { categories as allCategoriesData } from '../constants/datas';
+import { categories as allCategoriesData } from '../constants/datas'; // Ensure this path is correct
 
 const NAVBAR_TOOLBAR_HEIGHT = 64;
 const CATEGORY_ICON_BAR_HEIGHT = 60;
@@ -22,15 +41,15 @@ const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const [anchorElUserMenu, setAnchorElUserMenu] = React.useState(null);
+  const openUserMenu = Boolean(anchorElUserMenu);
 
   const handleClickUserMenu = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorElUserMenu(event.currentTarget);
   };
 
   const handleCloseUserMenu = () => {
-    setAnchorEl(null);
+    setAnchorElUserMenu(null);
   };
 
   const handleLogout = async () => {
@@ -44,7 +63,7 @@ const Navbar = () => {
     if (user && user._id) {
       navigate(`/profil/${user._id}`);
     } else {
-      navigate('/profil');
+      navigate('/login'); // Redirect to login if no user ID
     }
   };
 
@@ -53,9 +72,23 @@ const Navbar = () => {
     navigate('/ayarlar');
   };
 
+  const handleFavorites = () => {
+    navigate('/favorilerim'); // Navigate to favorites page
+  };
+
+  const handleCart = () => {
+    navigate('/sepetim'); // Navigate to cart page
+  };
+
+
   const handleCategorySelectInNavbar = (category) => {
     navigate(`/category/${category.value}`);
   };
+
+  // Favori ve sepet sayılarını kullanıcı objesinden al (örnek)
+  // Gerçek uygulamada bu veriler user objesinde veya ayrı bir state'ten gelmeli
+  const favoriteCount = user?.favorites?.length || 0;
+  const cartItemCount = user?.cart?.items?.length || 0; // Assuming user.cart.items is an array
 
   return (
     <AppBar
@@ -68,7 +101,8 @@ const Navbar = () => {
       <Toolbar sx={{
         minHeight: `${NAVBAR_TOOLBAR_HEIGHT}px!important`,
         height: `${NAVBAR_TOOLBAR_HEIGHT}px!important`,
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: theme.palette.primary.main, // Or your custom navbar color
+        color: 'white',
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
           <RouterLink to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
@@ -80,38 +114,58 @@ const Navbar = () => {
         </Box>
 
         {isAuthenticated && (
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
-            <Button component={RouterLink} to="/" sx={{ textTransform: 'none', fontSize: '1rem', color: 'white' }}>Ana Sayfa</Button>
-            <Button component={RouterLink} to="/urun-yukle" sx={{ textTransform: 'none', fontSize: '1rem', color: 'white' }}>Ürün Yükle</Button>
-            <Button component={RouterLink} to="/takas-teklifi" sx={{ textTransform: 'none', fontSize: '1rem', color: 'white' }}>Takas Teklifi</Button>
-            <Button component={RouterLink} to="/teklifleri-yonet" sx={{ textTransform: 'none', fontSize: '1rem', color: 'white' }}>Tekliflerim</Button>
-            <Button component={RouterLink} to="/takasta" sx={{ textTransform: 'none', fontSize: '1rem', color: 'white' }}>Takastalarım</Button>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1.5, mx: 2 }}>
+            <Button component={RouterLink} to="/" sx={{ textTransform: 'none', color: 'white' }}>Ana Sayfa</Button>
+            <Button component={RouterLink} to="/urun-yukle" sx={{ textTransform: 'none', color: 'white' }}>Ürün Yükle</Button>
+            <Button component={RouterLink} to="/takas-teklifi" sx={{ textTransform: 'none', color: 'white' }}>Teklif Yap</Button>
+            <Button component={RouterLink} to="/teklifleri-yonet" sx={{ textTransform: 'none', color: 'white' }}>Tekliflerim</Button>
+            <Button component={RouterLink} to="/takasta" sx={{ textTransform: 'none', color: 'white' }}>Takastakiler</Button>
           </Box>
         )}
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: isAuthenticated ? 2 : 0 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {isAuthenticated ? (
             <>
               <IconButton
+                onClick={handleFavorites}
+                color="inherit"
+                aria-label="favorilerim"
+                title="Favorilerim"
+              >
+                <Badge badgeContent={favoriteCount} color="error">
+                  <FavoriteBorderOutlined />
+                </Badge>
+              </IconButton>
+              <IconButton
+                onClick={handleCart}
+                color="inherit"
+                aria-label="sepetim"
+                title="Sepetim"
+              >
+                <Badge badgeContent={cartItemCount} color="error">
+                  <ShoppingCartOutlined />
+                </Badge>
+              </IconButton>
+              <Divider orientation="vertical" flexItem sx={{ bgcolor: 'rgba(255,255,255,0.3)', mx: 0.5, height: '24px', alignSelf: 'center' }} />
+              <IconButton
                 onClick={handleClickUserMenu}
                 size="small"
-                sx={{ ml: 0 }}
-                aria-controls={open ? 'account-menu' : undefined}
+                aria-controls={openUserMenu ? 'account-menu' : undefined}
                 aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
+                aria-expanded={openUserMenu ? 'true' : undefined}
               >
                 <Avatar sx={{ width: 36, height: 36, bgcolor: theme.palette.secondary.main }}>
                   {user?.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.firstName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={user.avatarUrl} alt={user.firstName} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   ) : (
                     user?.firstName?.charAt(0).toUpperCase() || <AccountCircle />
                   )}
                 </Avatar>
               </IconButton>
               <Menu
-                anchorEl={anchorEl}
+                anchorEl={anchorElUserMenu}
                 id="account-menu"
-                open={open}
+                open={openUserMenu}
                 onClose={handleCloseUserMenu}
                 onClick={handleCloseUserMenu}
                 PaperProps={{
@@ -120,6 +174,7 @@ const Navbar = () => {
                     overflow: 'visible',
                     filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                     mt: 1.5,
+                    minWidth: 200,
                     '& .MuiAvatar-root': { width: 32, height: 32, ml: -0.5, mr: 1 },
                     '&:before': {
                       content: '""', display: 'block', position: 'absolute', top: 0, right: 14,
@@ -131,27 +186,36 @@ const Navbar = () => {
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <Box sx={{ px: 2, py: 1 }}>
-                  <Typography variant="subtitle1" fontWeight="bold">{user?.firstName} {user?.lastName}</Typography>
-                  <Typography variant="body2" color="text.secondary">{user?.email}</Typography>
+                <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center' }}>
+                    <Avatar sx={{ width: 40, height: 40, mr: 1.5, bgcolor: theme.palette.secondary.light }}>
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.firstName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                            user?.firstName?.charAt(0).toUpperCase()
+                        )}
+                    </Avatar>
+                    <Box>
+                        <Typography variant="subtitle1" fontWeight="bold" noWrap>{user?.firstName} {user?.lastName}</Typography>
+                        <Typography variant="body2" color="text.secondary" noWrap>{user?.email}</Typography>
+                    </Box>
                 </Box>
                 <Divider />
                 <MenuItem onClick={handleProfile}><ListItemIcon><AccountCircle fontSize="small" /></ListItemIcon>Profilim</MenuItem>
-                <MenuItem onClick={handleSettings}><ListItemIcon><Settings fontSize="small" /></ListItemIcon>Ayarlar</MenuItem>
+                <MenuItem onClick={handleSettings}><ListItemIcon><Settings fontSize="small" /></ListItemIcon>Ayarlarım</MenuItem>
                 <Divider />
-                <MenuItem onClick={handleLogout}><ListItemIcon><Logout fontSize="small" /></ListItemIcon>Çıkış Yap</MenuItem>
+                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}><ListItemIcon><Logout fontSize="small" sx={{color: 'error.main'}}/></ListItemIcon>Çıkış Yap</MenuItem>
               </Menu>
             </>
           ) : (
             <>
-              <Button component={RouterLink} to="/login" variant="outlined" sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.7)', textTransform: 'none', fontSize: '0.9rem', '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)'}}}>Giriş Yap</Button>
-              <Button component={RouterLink} to="/register" variant="contained" sx={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'none', fontSize: '0.9rem', '&:hover': { backgroundColor: '#388e3c' }}}>Kayıt Ol</Button>
+              <Button component={RouterLink} to="/login" variant="outlined" sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.7)', textTransform: 'none', '&:hover': { borderColor: 'white', backgroundColor: 'rgba(255,255,255,0.1)'}}}>Giriş Yap</Button>
+              <Button component={RouterLink} to="/register" variant="contained" sx={{ backgroundColor: '#4caf50', color: 'white', textTransform: 'none', '&:hover': { backgroundColor: '#388e3c' }}}>Kayıt Ol</Button>
             </>
           )}
         </Box>
       </Toolbar>
 
-      <Box
+       <Box
         sx={{
           display: 'flex',
           alignItems: 'stretch',

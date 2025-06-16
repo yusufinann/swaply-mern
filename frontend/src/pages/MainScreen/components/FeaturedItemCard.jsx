@@ -108,7 +108,7 @@ const FeaturedItemCard = ({ item, theme, isHovered }) => {
             '& .item-image': { transform: 'scale(1.05)' },
           },
         }}
-        onClick={() => navigate(`/item/${item._id}`)}
+        onClick={() => navigate(`/takas-teklifi?itemId=${item._id}`)}
       >
         <Box sx={{ position: 'relative' }}>
           <CardMedia
