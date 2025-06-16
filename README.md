@@ -24,7 +24,7 @@ Swaply (Takasta)'nın temel misyonu, insanların artık ihtiyaç duymadıkları 
 
 ## 💡 Öne Çıkan Bilgiler ve Hedefler
 
-*   **Nakit Kullanmadan Takas:** Eşyaların doğrudan başka eşyalarla değiş tokuş edildiği bir ekosistem.
+*   **Nakit Kullanmadan Takas:** Eşyaların doğrudan başka eşyalarla değiş tokuş edildiği bir ekosistem.Duruma bağlı olarak eşya + nakit.
 *   **Sürdürülebilirlik Odaklı:** Yeniden kullanımı teşvik ederek atığı azaltma ve doğal kaynakların korunmasına katkı.
 *   **Topluluk Temelli:** Güven ve etkileşime dayalı bir kullanıcı topluluğu oluşturma.
 *   **Akıllı ve Kolay Kullanım:** Teknolojiyle desteklenmiş, kullanıcı dostu bir takas deneyimi sunma.
@@ -51,7 +51,7 @@ Bu MERN (MongoDB, Express, React, Node.js) yığını, projemize hız, esneklik 
 
 *   GitHub: [@yusufinann](https://github.com/yusufinann)
 *   LinkedIn: [Yusuf İnan](https://www.linkedin.com/in/yusuf-inan-a42396266/)
-*   Tanıtım Sitemiz (Tekrar): [infotakasta.netlify.app](https://infotakasta.netlify.app/)
+*   Tanıtım Sitemiz: [infotakasta.netlify.app](https://infotakasta.netlify.app/)
 
 ---
 
