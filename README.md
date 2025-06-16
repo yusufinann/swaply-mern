@@ -55,7 +55,7 @@ Swaply (Takasta), modern ve ölçeklenebilir bir mimari üzerine inşa edilmişt
 *   **Frontend:**
     *   **React.js:** Kullanıcı arayüzü geliştirmek için popüler bir JavaScript kütüphanesi.
     *   **Material UI (veya benzeri bir UI kütüphanesi):** Hızlı ve estetik bileşenler oluşturmak için.
-    *   **Context API / Redux (veya Zustand/Jotai):** Global state yönetimi için.
+    *   **Context API:** Global state yönetimi için.
     *   **React Router:** İstemci tarafı yönlendirme için.
 *   **Backend:**
     *   **Node.js:** Sunucu tarafı JavaScript çalışma zamanı ortamı.
