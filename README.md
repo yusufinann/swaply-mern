@@ -1,14 +1,18 @@
-# Swaply - MERN İkinci El Takas Platformu 🔁
+# Swaply - MERN Yığınlı İkinci El Takas Platformu 🔁
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/yusufinann/swaply-mern?style=social)](https://github.com/yusufinann/swaply-mern/stargazers)
-<!-- Diğer badge'leri gizlilik nedeniyle kaldırabilirsiniz veya sadece temel olanları tutabilirsiniz -->
 
 **Swaply (Takasta), kullanıcıların ikinci el eşyalarını nakit kullanmadan doğrudan başkalarıyla takas edebilecekleri, modern teknolojilerle geliştirilen yenilikçi bir platformdur.**
 
-> ♻️ **Sürdürülebilir ticaret artık çok kolay. Değerini biliyorsan, paraya gerek yok!**
+---
 
-**Daha Fazla Bilgi ve Platformun Arkasındaki Vizyon İçin:**
-👉 [**infotakasta.netlify.app**](https://infotakasta.netlify.app/)
+## ✨ Swaply (Takasta) Dünyasını Keşfedin! ✨
+
+**Platformumuzun arkasındaki vizyonu, misyonunu ve sunduğu benzersiz değeri daha yakından tanımak için tanıtım sitemizi ziyaret edin:**
+
+## 👉 [**infotakasta.netlify.app**](https://infotakasta.netlify.app/) 👈
+
+> ♻️ **Sürdürülebilir ticaret artık çok kolay. Değerini biliyorsan, paraya gerek yok!**
 
 ---
 
@@ -18,7 +22,7 @@ Swaply (Takasta)'nın temel misyonu, insanların artık ihtiyaç duymadıkları 
 
 ---
 
-## ✨ Öne Çıkan Bilgiler ve Hedefler
+## 💡 Öne Çıkan Bilgiler ve Hedefler
 
 *   **Nakit Kullanmadan Takas:** Eşyaların doğrudan başka eşyalarla değiş tokuş edildiği bir ekosistem.
 *   **Sürdürülebilirlik Odaklı:** Yeniden kullanımı teşvik ederek atığı azaltma ve doğal kaynakların korunmasına katkı.
@@ -47,7 +51,7 @@ Bu MERN (MongoDB, Express, React, Node.js) yığını, projemize hız, esneklik 
 
 *   GitHub: [@yusufinann](https://github.com/yusufinann)
 *   LinkedIn: [Yusuf İnan](https://www.linkedin.com/in/yusuf-inan-a42396266/)
-*   Tanıtım Sitesi: [infotakasta.netlify.app](https://infotakasta.netlify.app/)
+*   Tanıtım Sitemiz (Tekrar): [infotakasta.netlify.app](https://infotakasta.netlify.app/)
 
 ---
 
