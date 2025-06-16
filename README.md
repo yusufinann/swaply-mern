@@ -1,9 +1,9 @@
-# Swaply - MERN Yığınlı İkinci El Takas Platformu 🔁
+# Swaply - MERN İkinci El Takas Platformu 🔁
 
 [![GitHub Repo stars](https://img.shields.io/github/stars/yusufinann/swaply-mern?style=social)](https://github.com/yusufinann/swaply-mern/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/yusufinann/swaply-mern?style=social)](https://github.com/yusufinann/swaply-mern/network/members)
 [![GitHub issues](https://img.shields.io/github/issues/yusufinann/swaply-mern)](https://github.com/yusufinann/swaply-mern/issues)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) <!-- Eğer bir lisansınız varsa -->
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) 
 
 **Swaply (Takasta), kullanıcıların ikinci el eşyalarını listeleyebilecekleri ve bunları nakit kullanmadan doğrudan başkalarıyla takas edebilecekleri, MERN yığını (MongoDB, Express, React, Node.js) ile oluşturulmuş tam yığınlı bir web uygulamasıdır.**
 
