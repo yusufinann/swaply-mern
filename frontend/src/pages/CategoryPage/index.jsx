@@ -15,7 +15,7 @@ const CategoryPage = () => {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    const foundCategory = categories.find(cat => cat.value.toLowerCase() === categoryId.toLowerCase());
+    const foundCategory = categories.find(cat => cat.value.toLowerCase() === categoryId.toLowerCase()); //Slug uyumlu hale getirildi.
 
     if (foundCategory) {
       setCategoryInfo(foundCategory);

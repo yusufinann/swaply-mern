@@ -12,20 +12,20 @@ import {
   MenuItem,
   ListItemIcon,
   Divider,
-  Badge, // Badge için eklendi
+  Badge,
 } from '@mui/material';
 import {
   Logout,
   AccountCircle,
   Settings,
-  ShoppingCartOutlined, // Sepet ikonu
-  FavoriteBorderOutlined, // Favori ikonu
+  ShoppingCartOutlined,
+  FavoriteBorderOutlined,
 } from '@mui/icons-material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../shared/context/AuthContext';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
-import { categories as allCategoriesData } from '../constants/datas'; // Ensure this path is correct
+import { categories as allCategoriesData } from '../constants/datas';
 
 const NAVBAR_TOOLBAR_HEIGHT = 64;
 const CATEGORY_ICON_BAR_HEIGHT = 60;
@@ -63,7 +63,7 @@ const Navbar = () => {
     if (user && user._id) {
       navigate(`/profil`);
     } else {
-      navigate('/login'); // Redirect to login if no user ID
+      navigate('/login');
     }
   };
 
@@ -73,22 +73,19 @@ const Navbar = () => {
   };
 
   const handleFavorites = () => {
-    navigate('/favorilerim'); // Navigate to favorites page
+    navigate('/favorilerim');
   };
 
   const handleCart = () => {
-    navigate('/sepetim'); // Navigate to cart page
+    navigate('/sepetim');
   };
-
 
   const handleCategorySelectInNavbar = (category) => {
     navigate(`/category/${category.value}`);
   };
 
-  // Favori ve sepet sayılarını kullanıcı objesinden al (örnek)
-  // Gerçek uygulamada bu veriler user objesinde veya ayrı bir state'ten gelmeli
   const favoriteCount = user?.favorites?.length || 0;
-  const cartItemCount = user?.cart?.items?.length || 0; // Assuming user.cart.items is an array
+  const cartItemCount = user?.cart?.items?.length || 0;
 
   return (
     <AppBar
@@ -101,7 +98,7 @@ const Navbar = () => {
       <Toolbar sx={{
         minHeight: `${NAVBAR_TOOLBAR_HEIGHT}px!important`,
         height: `${NAVBAR_TOOLBAR_HEIGHT}px!important`,
-        backgroundColor: theme.palette.primary.main, // Or your custom navbar color
+        backgroundColor: theme.palette.primary.main,
         color: 'white',
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import apiClient from '../../api/apiClient'; 
+import apiClient from '../../api/apiClient';
 
 const AuthContext = createContext(null);
 
@@ -19,35 +19,26 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = localStorage.getItem('authToken');
-      const storedUser = localStorage.getItem('authUser');
 
       if (storedToken) {
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
         try {
-          const response = await apiClient.get('/auth/me'); 
+          const response = await apiClient.get('/auth/me');
           if (response.data && response.data.user) {
             const { password, ...userWithoutPassword } = response.data.user;
             setUser(userWithoutPassword);
             setToken(storedToken);
-            localStorage.setItem('authUser', JSON.stringify(userWithoutPassword)); 
+            const { favorites, cart, ...staticUserInfo } = userWithoutPassword;
+            localStorage.setItem('authUser', JSON.stringify(staticUserInfo));
           } else {
             throw new Error("User data not found in response");
           }
         } catch (error) {
-          console.warn("Auth initialization/verification failed, clearing session:", error.message);
           localStorage.removeItem('authToken');
           localStorage.removeItem('authUser');
           delete apiClient.defaults.headers.common['Authorization'];
           setUser(null);
           setToken(null);
-        }
-      } else if (storedUser) {
-        try {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser); // Potentially set user, but without a token, they can't make authenticated requests.
-            console.warn("Auth token missing, but user data found in localStorage. User not fully authenticated.");
-        } catch (e) {
-            localStorage.removeItem('authUser');
         }
       }
       setLoading(false);
@@ -58,8 +49,10 @@ const AuthProvider = ({ children }) => {
 
   const login = useCallback((userData, authToken) => {
     const { password, ...userWithoutPassword } = userData;
+    const { favorites, cart, ...staticUserInfo } = userWithoutPassword;
+    
     localStorage.setItem('authToken', authToken);
-    localStorage.setItem('authUser', JSON.stringify(userWithoutPassword));
+    localStorage.setItem('authUser', JSON.stringify(staticUserInfo));
 
     apiClient.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
     setUser(userWithoutPassword);
@@ -85,23 +78,23 @@ const AuthProvider = ({ children }) => {
         setUser(prevUser => {
             const updatedUser = newUserData(prevUser);
             if (updatedUser) { 
-                localStorage.setItem('authUser', JSON.stringify(updatedUser));
+                const { password, favorites, cart, ...staticUserInfo } = updatedUser;
+                localStorage.setItem('authUser', JSON.stringify(staticUserInfo));
             }
             return updatedUser;
         });
-    } else if (newUserData) { 
-        setUser(newUserData);
-        localStorage.setItem('authUser', JSON.stringify(newUserData));
     } else {
-        setUser(newUserData); 
-        if(newUserData === null) {
+        setUser(newUserData);
+        if (newUserData) {
+            const { password, favorites, cart, ...staticUserInfo } = newUserData;
+            localStorage.setItem('authUser', JSON.stringify(staticUserInfo));
+        } else if (newUserData === null) {
             localStorage.removeItem('authUser');
         }
     }
   }, []);
 
-
-  const isAuthenticated = !!token && !!user; 
+  const isAuthenticated = !!token && !!user;
 
   const value = {
     user,
@@ -110,7 +103,7 @@ const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
-    updateUser, 
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

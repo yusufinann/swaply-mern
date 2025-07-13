@@ -1,14 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals';
-import AppRouter from './router';
-import AuthProvider from './shared/context/AuthContext';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import reportWebVitals from "./reportWebVitals";
+import AppRouter from "./router";
+import AuthProvider from "./shared/context/AuthContext";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <AuthProvider> <AppRouter/></AuthProvider>
-   
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   </React.StrictMode>
 );
 

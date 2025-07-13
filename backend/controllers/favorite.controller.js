@@ -33,29 +33,32 @@ export const addFavorites=async(req,res)=>{
 
 }
 
-export const removeFavorites=async(req,res)=>{
+export const removeFavorites = async (req, res) => {
     try {
-        const userId=req.user._id;
-        const {itemId}=req.params;
+        const userId = req.user._id;
+        const { itemId } = req.params;
 
-        const user=await User.findById(userId);
-        if(!user){
-            return res.status(404).json({success:false,nessage:"user not found"})
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
         }
 
+        // Mongoose's .pull() method removes all instances of a value from an array.
         user.favorites.pull(itemId);
         await user.save();
+
+        // **THE FIX IS HERE:**
+        // The response object now uses 'success: true' and a consistent message key.
         res.status(200).json({
-            status:true,
-            message:"item removed from favorites",
-            favorites:user.favorites
-        })
-    } catch (error) {        
-      console.error("Favori çıkarma hatası:", error);
+            success: true,
+            message: "Ürün favorilerden çıkarıldı.",
+            favorites: user.favorites // Return the updated list of favorite IDs
+        });
+    } catch (error) {
+        console.error("Favori çıkarma hatası:", error);
         res.status(500).json({ success: false, message: 'Sunucu hatası.', error: error.message });
     }
 }
-
 export const getMyFavorites=async(req,res)=>{
     try {
         const userId = req.user._id;
