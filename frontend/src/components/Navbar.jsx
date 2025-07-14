@@ -117,6 +117,9 @@ const Navbar = () => {
             <Button component={RouterLink} to="/takas-teklifi" sx={{ textTransform: 'none', color: 'white' }}>Teklif Yap</Button>
             <Button component={RouterLink} to="/teklifleri-yonet" sx={{ textTransform: 'none', color: 'white' }}>Tekliflerim</Button>
             <Button component={RouterLink} to="/takasta" sx={{ textTransform: 'none', color: 'white' }}>Takastakiler</Button>
+          <Button color="inherit" component={RouterLink} to="/chats">
+    Mesajlarım
+</Button>
           </Box>
         )}
 

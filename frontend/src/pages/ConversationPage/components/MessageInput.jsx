@@ -1,4 +1,3 @@
-// components/MessageInput.js
 import React, { useState } from 'react';
 import { Box, TextField, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
@@ -11,10 +10,11 @@ const styles = {
         alignItems: 'center',
         borderTop: '1px solid #e0e0e0',
         backgroundColor: '#fff',
+        flexShrink: 0,
     },
 };
 
-const MessageInput = ({ onSendMessage }) => {
+const MessageInput = ({ onSendMessage, disabled }) => {
     const [text, setText] = useState('');
 
     const handleSend = () => {
@@ -36,28 +36,24 @@ const MessageInput = ({ onSendMessage }) => {
             <TextField
                 fullWidth
                 variant="outlined"
-                placeholder="Mesajınızı yazın..."
+                placeholder={disabled ? "Bağlantı kuruluyor..." : "Mesajınızı yazın..."}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyPress={handleKeyPress}
                 multiline
                 maxRows={4}
+                disabled={disabled}
                 sx={{
                     '& .MuiOutlinedInput-root': {
                         borderRadius: '20px',
-                        '& fieldset': {
-                            borderColor: '#e0e0e0',
-                        },
-                        '&:hover fieldset': {
-                            borderColor: '#b0b0b0',
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: 'primary.main',
-                        },
                     },
                 }}
             />
-            <IconButton color="primary" onClick={handleSend} disabled={!text.trim()}>
+            <IconButton
+                color="primary"
+                onClick={handleSend}
+                disabled={disabled || !text.trim()}
+            >
                 <SendIcon />
             </IconButton>
         </Box>

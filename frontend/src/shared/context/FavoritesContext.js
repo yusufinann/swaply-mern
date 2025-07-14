@@ -1,3 +1,5 @@
+// src/shared/context/FavoritesContext.js
+
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { getMyFavoriteItemsDetails, addFavoriteItem, removeFavoriteItem } from '../../services/userService';
@@ -33,6 +35,7 @@ export const FavoritesProvider = ({ children }) => {
       if (response.success && Array.isArray(response.favorites)) {
         setFavoriteItems(response.favorites);
         setFavoriteIds(new Set(response.favorites.map(item => item._id)));
+        setError(null); // Başarılı fetch sonrası hatayı temizle
       } else {
         setError(response.message || 'Favori ürünler alınamadı.');
       }
@@ -49,9 +52,9 @@ export const FavoritesProvider = ({ children }) => {
   
   const isFavorited = useCallback((itemId) => favoriteIds.has(itemId), [favoriteIds]);
 
+
   const addFavorite = useCallback(async (itemId) => {
     const originalIds = new Set(favoriteIds);
-    
     setFavoriteIds(prevIds => new Set(prevIds).add(itemId));
 
     try {
@@ -60,17 +63,19 @@ export const FavoritesProvider = ({ children }) => {
         throw new Error(response.message || 'Ürün favorilere eklenemedi.');
       }
       
+      // AuthContext'i güncelle
       updateUser(prevUser => ({ ...prevUser, favorites: response.favorites }));
-      setFavoriteIds(new Set(response.favorites));
+      await fetchFavorites();
       
       return { success: true, message: 'Ürün favorilere eklendi!' };
     } catch (err) {
+      // Hata durumunda anlık güncellemeyi geri al
       setFavoriteIds(originalIds);
       return { success: false, message: err.message || 'Favori ekleme işlemi başarısız oldu.' };
     }
-  }, [favoriteIds, updateUser]);
+  }, [favoriteIds, updateUser, fetchFavorites]); // fetchFavorites'i dependency array'e ekle
 
-  const removeFavorite = useCallback(async (itemId, isFromListPage = false) => {
+  const removeFavorite = useCallback(async (itemId) => {
     const originalIds = new Set(favoriteIds);
     const originalItems = [...favoriteItems];
     
@@ -79,9 +84,7 @@ export const FavoritesProvider = ({ children }) => {
       newIds.delete(itemId);
       return newIds;
     });
-    if (isFromListPage) {
-        setFavoriteItems(prevItems => prevItems.filter(item => item._id !== itemId));
-    }
+    setFavoriteItems(prevItems => prevItems.filter(item => item._id !== itemId));
     
     try {
       const response = await removeFavoriteItem(itemId);
@@ -90,17 +93,18 @@ export const FavoritesProvider = ({ children }) => {
       }
       
       updateUser(prevUser => ({ ...prevUser, favorites: response.favorites }));
-      setFavoriteIds(new Set(response.favorites));
+      
+      //await fetchFavorites();
       
       return { success: true, message: 'Ürün favorilerden çıkarıldı.' };
     } catch (err) {
       setFavoriteIds(originalIds);
-      if (isFromListPage) {
-          setFavoriteItems(originalItems);
-      }
+      setFavoriteItems(originalItems);
       return { success: false, message: err.message || 'Favori çıkarma işlemi başarısız oldu.' };
     }
-  }, [favoriteIds, favoriteItems, updateUser]);
+  }, [favoriteIds, favoriteItems, updateUser]); 
+
+
 
   const value = {
     favoriteItems,
@@ -110,7 +114,7 @@ export const FavoritesProvider = ({ children }) => {
     isFavorited,
     addFavorite,
     removeFavorite,
-    fetchFavorites,
+    fetchFavorites, // Bu fonksiyonu dışarıya vermek her zaman iyi bir pratiktir
   };
 
   return (

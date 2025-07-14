@@ -3,6 +3,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:300
 
 const config = {
   apiBaseUrl: API_BASE_URL,
+    wsBaseUrl: 'ws://localhost:3001',
   apiEndpoints: {
     // These should be relative paths from API_BASE_URL
     items: "/items", 

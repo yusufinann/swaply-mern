@@ -4,8 +4,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-
-// YENİ EKLEDİK: FavoritesProvider'ı buraya import ediyoruz.
 import { FavoritesProvider } from '../shared/context/FavoritesContext';
 
 import MainAppLayout from '../layouts/MainAppLayout';
@@ -18,6 +16,7 @@ import CategoryPage from '../pages/CategoryPage/index.jsx';
 import MyFavoritesPage from '../pages/MyFavoritesPage/index.jsx';
 import ProfilePage from '../pages/ProfilePage/index.jsx';
 import ConversationPage from '../pages/ConversationPage/index.jsx';
+import MyChatsPage from '../pages/MyChatPage/index.jsx';
 
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/RegisterPage/index.jsx'));
@@ -63,7 +62,8 @@ const AppRouter = () => {
                     <Route path="favorilerim" element={<MyFavoritesPage />} />
                     <Route path="profil" element={<ProfilePage />} />
                     <Route path="/profil/:userId" element={<ProfilePage />} />
-                    <Route path="/swap-offer/:id" element={<ConversationPage />} />
+                    <Route path="/chats/:chatId" element={<ConversationPage />} />
+                    <Route path="/chats" element={<MyChatsPage />} />
                   </Route>
                 </Route>
               </Route>

@@ -1,20 +1,20 @@
-// ConversationPage.js
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
 import { useConversationPage } from './useConversationPage';
-import ChatList from './components/ChatList';
+import ProductInfo from './components/ProductInfo';
 import ChatHeader from './components/ChatHeader';
 import MessageArea from './components/MessageArea';
 import MessageInput from './components/MessageInput';
+import { useWebSocket } from '../../shared/context/WebSocketContext/context';
 
 const styles = {
     mainContainer: {
         display: 'flex',
         flexDirection: 'row',
-        height: 'calc(90vh - 64px)', // Adjust based on your AppBar height
+        height: 'calc(90vh - 64px)',
         backgroundColor: '#fff',
-        gap:10,
-        p:2
+        gap: 10,
+        p: 2
     },
     loadingContainer: {
         display: 'flex',
@@ -30,28 +30,18 @@ const styles = {
         flexDirection: 'column',
         width: { xs: '60vw', md: '60vw' },
         height: '100%',
+        border: '1px solid #e0e0e0',
+        borderRadius: '8px',
+        overflow: 'hidden'
     },
 };
 
 const ConversationPage = () => {
-    const { item: initialItem, currentUser, loading, error } = useConversationPage();
-    const [messages, setMessages] = useState([]);
+    // Hook'tan dönen değerler değişti. Artık 'item' yok.
+    const { chat, messages, currentUser, loading, error, sendMessage } = useConversationPage();
+    const { isConnected } = useWebSocket();
 
-    useEffect(() => {
-        if (initialItem?.messages) {
-            setMessages(initialItem.messages);
-        }
-    }, [initialItem]);
-
-    const handleSendMessage = (text) => {
-        const newMessage = {
-            id: Date.now(),
-            senderId: currentUser.id,
-            text,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-    };
+    const isSendDisabled = loading || !isConnected || !chat;
 
     if (loading) {
         return (
@@ -70,21 +60,23 @@ const ConversationPage = () => {
         );
     }
 
-    if (!initialItem) {
+    // Artık 'chat' objesinin varlığını kontrol ediyoruz.
+    if (!chat) {
         return (
             <Box sx={styles.errorContainer}>
-                <Alert severity="warning">Sohbete konu olan ürün bulunamadı.</Alert>
+                <Alert severity="warning">Sohbet bulunamadı.</Alert>
             </Box>
         );
     }
 
     return (
         <Box sx={styles.mainContainer}>
-            <ChatList />
+             <ProductInfo />
             <Box sx={styles.activeChatPanel}>
-                <ChatHeader item={initialItem} />
+                {/* ChatHeader'a chat.item'ı gönderiyoruz */}
+                <ChatHeader item={chat.item} />
                 <MessageArea messages={messages} currentUser={currentUser} />
-                <MessageInput onSendMessage={handleSendMessage} />
+                <MessageInput onSendMessage={sendMessage} disabled={isSendDisabled} />
             </Box>
         </Box>
     );

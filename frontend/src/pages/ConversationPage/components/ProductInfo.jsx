@@ -1,4 +1,3 @@
-// components/ChatList.js
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 
@@ -9,6 +8,7 @@ const styles = {
         borderRight: '1px solid #e0e0e0',
         width: '320px',
         flexShrink: 0,
+        height: '60%',
     },
     header: {
         p: 2,
@@ -31,16 +31,16 @@ const styles = {
     },
 };
 
-const ChatList = () => {
+const ProductInfo = () => {
     return (
         <Box sx={styles.panel}>
             <Box sx={styles.header}>
-                <Typography variant="h6" fontWeight="bold">Sohbetlerim</Typography>
+                <Typography variant="h6" fontWeight="bold">Ürün bilgileri</Typography>
             </Box>
             <Box sx={styles.placeholderContainer}>
                 <Box sx={styles.placeholder}>
                     <Typography color="text.secondary">
-                        Diğer sohbetleriniz burada listelenecek.
+                        ürün bilgileri burada listelenecek.
                     </Typography>
                 </Box>
             </Box>
@@ -48,4 +48,4 @@ const ChatList = () => {
     );
 };
 
-export default ChatList;
+export default ProductInfo;

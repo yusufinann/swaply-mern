@@ -83,7 +83,7 @@ const SwapOfferPage = () => {
       </Box>
     );
   }
-
+console.log(item)
   return (
     <Box sx={{ width: '100%', mx: 'auto' }}>
       <Paper elevation={3} sx={{ p: { xs: 1.5, sm: 2, md: 3 }, overflow: 'hidden' }}>

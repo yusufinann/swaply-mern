@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { getItemById as getItemByIdApi } from '../../services/itemService';
+import { initiateChatForItem } from '../../services/chatService'; // YENİ: Servisi import et
 import { useAuth } from '../../shared/context/AuthContext';
 import { useFavorites } from '../../shared/context/FavoritesContext';
 
@@ -35,6 +36,7 @@ export const useSwapOfferPage = () => {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [offerLoading, setOfferLoading] = useState(false); // YENİ: Teklif butonu için yükleme durumu
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
@@ -81,7 +83,7 @@ export const useSwapOfferPage = () => {
             throw new Error(result.message);
         }
     } catch (err) {
-        setSnackbar({ open: true, message: err.message || "Favori işlemi başarısız oldu, lütfen tekrar deneyin.", severity: 'error' });
+        setSnackbar({ open: true, message: err.message || "Favori işlemi başarısız oldu.", severity: 'error' });
     } finally {
         setFavoriteLoading(false);
     }
@@ -102,7 +104,7 @@ export const useSwapOfferPage = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
-  const handleMakeOffer = () => {
+  const handleMakeOffer = async () => {
     if (!authUser) {
       setSnackbar({ open: true, message: 'Teklif yapmak için giriş yapmalısınız.', severity: 'info' });
       return;
@@ -111,31 +113,42 @@ export const useSwapOfferPage = () => {
       setSnackbar({ open: true, message: 'Kendi ürününüze teklif yapamazsınız.', severity: 'warning' });
       return;
     }
-    navigate(`/swap-offer/${item._id}`);
-    console.log("Make offer for item:", item._id);
-    setSnackbar({ open: true, message: `"${item.title}" için takas teklifi oluşturma süreci başlayacak.`, severity: 'info' });
+
+    setOfferLoading(true);
+    try {
+        const response = await initiateChatForItem(item._id);
+        if (response.success && response.data?._id) {
+            const chatId = response.data._id;
+            navigate(`/chats/${chatId}`);
+        } else {
+            throw new Error(response.message || 'Sohbet odasına yönlendirilemedi.');
+        }
+    } catch (err) {
+        setSnackbar({ open: true, message: err.response?.data?.message || err.message || 'Bir hata oluştu.', severity: 'error' });
+    } finally {
+        setOfferLoading(false);
+    }
   };
   
   const isOwner = authUser && item && item.owner?._id === authUser._id;
   const itemIsFavorited = item ? isFavorited(item._id) : false;
 
-  const mainImage = item?.images && item.images.length > 0 ? item.images[0] : 'https://via.placeholder.com/600x400.png?text=Resim+Yok';
-  const otherImages = item?.images && item.images.length > 1 ? item.images.slice(1) : [];
+  const mainImage = item?.images?.[0] || 'https://via.placeholder.com/600x400.png?text=Resim+Yok';
+  const otherImages = item?.images?.slice(1) || [];
   const productRatingValue = item?.rating || 4.0;
   const reviewCount = item?.reviewCount || 0;
   const qaCount = item?.qaCount || 0;
   const popularityText = item?.popularityText || "Popüler ürün!";
 
   return {
-    itemId,
     item,
-    loading: loading,
+    loading,
     error,
     selectedImage,
     isFavorited: itemIsFavorited,
     favoriteLoading,
+    offerLoading,
     snackbar,
-    setSnackbar,
     isOwner,
     mainImage,
     otherImages,
@@ -143,7 +156,6 @@ export const useSwapOfferPage = () => {
     reviewCount,
     qaCount,
     popularityText,
-    navigate,
     handleToggleFavorite,
     handleImageClick,
     handleCloseImageDialog,

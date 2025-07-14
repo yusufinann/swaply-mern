@@ -3,12 +3,16 @@ import ReactDOM from "react-dom/client";
 import reportWebVitals from "./reportWebVitals";
 import AppRouter from "./router";
 import AuthProvider from "./shared/context/AuthContext";
+import { WebSocketProvider } from "./shared/context/WebSocketContext/context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <AppRouter />
+      <WebSocketProvider>
+        <AppRouter />
+      </WebSocketProvider>
+      
     </AuthProvider>
   </React.StrictMode>
 );

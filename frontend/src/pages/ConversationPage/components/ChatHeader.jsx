@@ -38,7 +38,7 @@ const ChatHeader = ({ item }) => {
                     {item.title}
                 </Typography>
                 <Typography variant='body2' color="text.secondary">
-                    {item.owner?.firstName || 'Bilinmeyen Kullanıcı'} ile sohbet
+                    {item.owner?.firstName || 'Bilinmeyen Kullanıcı'} ile sohbet id: {item.owner._id}
                 </Typography>
             </Box>
         </Box>

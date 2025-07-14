@@ -1,7 +1,9 @@
-// components/MessageArea.js
+// src/components/MessageArea.js (GÜNCELLENMİŞ)
+
 import React, { useRef, useEffect } from 'react';
-import { Box, Stack } from '@mui/material';
+import { Box } from '@mui/material'; // Stack import'u kaldırıldı
 import MessageBubble from './MessageBubble';
+import DateHeader from './DateHeader';
 
 const styles = {
     messageArea: {
@@ -22,28 +24,42 @@ const styles = {
 };
 
 const MessageArea = ({ messages, currentUser }) => {
-    const endOfMessagesRef = useRef(null);
+    const scrollContainerRef = useRef(null);
 
-    // const scrollToBottom = () => {
-    //     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
-    // };
+    useEffect(() => {
+        if (scrollContainerRef.current) {
+            const scrollContainer = scrollContainerRef.current;
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+        }
+    }, [messages]);
 
-    // useEffect(() => {
-    //     scrollToBottom();
-    // }, [messages]);
+    if (!currentUser) return null;
+
+    const chatElements = [];
+    let lastMessageDate = null;
+
+    messages.forEach((msg) => {
+        const messageDate = new Date(msg.createdAt).toDateString();
+
+        if (messageDate !== lastMessageDate) {
+            chatElements.push(
+                <DateHeader key={messageDate} date={msg.createdAt} />
+            );
+            lastMessageDate = messageDate;
+        }
+
+        chatElements.push(
+            <MessageBubble
+                key={msg._id}
+                message={msg}
+                isOwnMessage={msg.sender?._id === currentUser._id}
+            />
+        );
+    });
 
     return (
-        <Box sx={styles.messageArea}>
-            <Stack spacing={2}>
-                {messages.map((msg) => (
-                    <MessageBubble
-                        key={msg.id}
-                        message={msg}
-                        isOwnMessage={msg.senderId === currentUser.id}
-                    />
-                ))}
-            </Stack>
-            <div ref={endOfMessagesRef} />
+        <Box sx={styles.messageArea} ref={scrollContainerRef}>
+            {chatElements}
         </Box>
     );
 };
